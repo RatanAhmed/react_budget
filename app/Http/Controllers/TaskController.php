@@ -20,7 +20,7 @@ class TaskController extends Controller
             $query->where('date', $request->date);
         });
 
-        $tasks = $tasksQuery->get();
+        $tasks = $tasksQuery->orderBy('date')->get();
 
         return Inertia::render('Task/Index', [
             'tasks' => $tasks,

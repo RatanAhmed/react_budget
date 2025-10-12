@@ -76,7 +76,7 @@ export default function Index({ auth, tasks }) {
                 <div className="bg-white p-4 sm:p-4 md:p-6 rounded-md border border-gray-50 shadow-md">
                     <div className="flex justify-between">
                         <TextInput type="date" name="date" className="" onChange={(e)=>{filter(e)}}/>
-                        <button type="button"  className="bg-green-600 text-white rounded px-2 py-1" onChange={(e)=>{addTask(e)}}>Add Task</button>
+                        <button type="button"  className="inline-flex items-center px-2 py-1 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150" onChange={(e)=>{addTask(e)}}>Add Task</button>
                     </div>
                     {/* <div>
                         <form onSubmit={submit} className="bg-white p-4 sm:p-4 md:p-6 rounded-md border border-gray-50 shadow-md">
@@ -149,14 +149,14 @@ export default function Index({ auth, tasks }) {
                             </div>
                         </form>
                     </div> */}
-                    <table className="table-auto w-full mt-2">
+                    <table className="table-auto w-full mt-2 text-sm">
                         <thead>
                             <tr>
-                                <th className="border border-slate-300">Date</th>
+                                <th className="border border-slate-300">Date & Time</th>
                                 <th className="border border-slate-300">Details</th>
                                 <th className="border border-slate-300">Priority</th>
                                 <th className="border border-slate-300">Status</th>
-                                <th className="border border-slate-300">Remarks</th>
+                                {/* <th className="border border-slate-300">Remarks</th> */}
                                 <th className="border border-slate-300">Action</th>
                             </tr>
                         </thead>
@@ -199,11 +199,11 @@ export default function Index({ auth, tasks }) {
                                             )
                                             : "Done"} */}
                                     </td>
-                                    <td className="text-center border border-slate-300">
+                                    {/* <td className="text-center border border-slate-300">
                                         {task.remarks}
-                                    </td>
+                                    </td> */}
                                     <td className="text-center border border-slate-300">
-                                        <button onClick={() => editTask(task.id)} className="bg-green-600 px-1 rounded text-white">Edit</button>
+                                        <button onClick={() => editTask(task.id)} className="inline-flex items-center px-2 py-1 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">Edit</button>
                                     </td>
                                 </tr>
                             ))}
@@ -219,13 +219,13 @@ export default function Index({ auth, tasks }) {
                         </div>
                         <div className="grid grid-cols-2 gap-4 mt-4">
                             <div>
-                                <InputLabel htmlFor="date" value="Date" />
+                                <InputLabel htmlFor="date" value="Date & Time" />
 
                                 <TextInput
                                     id="date"
-                                    type="date"
+                                    type="datetime-local"
                                     className="mt-1 block w-full"
-                                    value={data.date}
+                                    value={data.date ?? now()}
                                     onChange={(e) =>
                                         setData("date", e.target.value)
                                     }
