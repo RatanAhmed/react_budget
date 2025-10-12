@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\BudgetController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\IncomeController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +22,7 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
+    return Inertia::render('SoftwareCenterLanding', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
@@ -44,6 +45,8 @@ Route::group(['middleware' => ['auth', 'verified']], function() {
     Route::resource('/budget', BudgetController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('/expense', ExpenseController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('/category', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::post('/tasks/{task}/update-status', [TaskController::class, 'updateStatus'])->name('tasks.update-status');
+    Route::resource('/tasks', TaskController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
 
