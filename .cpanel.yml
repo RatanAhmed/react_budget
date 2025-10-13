@@ -1,0 +1,7 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/jesbwjog/repositories/react_budget
+    - /opt/cpanel/composer/bin/composer install --no-dev -d $DEPLOYPATH
+    - npm install --prefix $DEPLOYPATH
+    - npm run build --prefix $DEPLOYPATH
+    - php $DEPLOYPATH/artisan migrate --force
