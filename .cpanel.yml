@@ -1,7 +1,20 @@
+---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/jesbwjog/repositories/react_budget
-    - /opt/cpanel/composer/bin/composer install --no-dev -d $DEPLOYPATH
-    - npm install --prefix $DEPLOYPATH
-    - npm run build --prefix $DEPLOYPATH
-    - php $DEPLOYPATH/artisan migrate --force
+    - export APPPATH=/home/jesbwjog/repositories/react_budget
+
+    # Install composer dependencies
+    - cd $APPPATH && /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader
+    
+    # Install node dependencies
+    - npm install --prefix $APPPATH
+    - npm run build --prefix $APPPATH
+    # Clear and re-cache Laravel
+    - php $APPPATH/artisan config:clear
+    - php $APPPATH/artisan config:cache
+    - php $APPPATH/artisan route:cache
+    - php $APPPATH/artisan view:cache
+
+    # Fix permissions
+    - chmod -R 775 $APPPATH/storage
+    - chmod -R 775 $APPPATH/bootstrap/cache
