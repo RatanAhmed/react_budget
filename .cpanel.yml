@@ -2,7 +2,9 @@
 deployment:
   tasks:
     - export APPPATH=/home/jesbwjog/repositories/react_budget
-
+    # Allow write access to .htaccess and web files
+    - /bin/chmod -R 775 $DEPLOYPATH
+    
     # Install composer dependencies
     - cd $APPPATH && /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader
     
