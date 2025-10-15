@@ -43,6 +43,7 @@ class TaskController extends Controller
         
         $validated = $request->validate([
             'date'    => 'required|date',
+            'time' => 'required|date_format:H:i',
             'details'   => 'required|string|max:255',
             'priority'    => 'required|numeric',
             'remarks'    => 'nullable|string',

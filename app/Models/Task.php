@@ -11,9 +11,11 @@ class Task extends Model
     use AuditUserActions, HasFactory;
     protected $fillable = [
         'date', 
+        'time', 
         'details', 
         'priority', 
         'status', 
         'remarks', 
+        'created_by', 
     ];
 }

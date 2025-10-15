@@ -12,6 +12,7 @@ export default function Index({ auth, tasks }) {
     const { data, setData, post, processing, reset, errors } = useForm({
         id: "",
         date: "",
+        time: "",
         details: "",
         priority: 1,
         status: "",
@@ -46,13 +47,21 @@ export default function Index({ auth, tasks }) {
         });
     };
     const filter = (e) => {
-        e.preventDefault();
-        router.get(route('tasks.index'), {
-            date: e.target.value,
-        },{
+        const value = e.target.value;
+
+        // If a date is selected, filter by it
+        if (value) {
+            router.get(route('tasks.index'), { date: value }, {
             preserveState: true,
             preserveScroll: true,
-        });
+            });
+        } else {
+            // If cleared, remove the filter (no query params)
+            router.get(route('tasks.index'), {}, {
+            preserveState: true,
+            preserveScroll: true,
+            });
+        }
     };
     // const updateStatus = async (e, taskId) => {
     //     e.preventDefault();
@@ -66,6 +75,14 @@ export default function Index({ auth, tasks }) {
     //         console.error(err.response?.data || err.message);
     //     }
     // };
+    const formatTime = (time) => {
+        if (!time) return '';
+        return new Date(`1970-01-01T${time}`).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        });
+    };
 
 
     return (
@@ -75,7 +92,7 @@ export default function Index({ auth, tasks }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 sm:p-6 lg:p-8">
                 <div className="bg-white p-4 sm:p-4 md:p-6 rounded-md border border-gray-50 shadow-md">
                     <div className="flex justify-between">
-                        <TextInput type="date" name="date" value={Date('yyyy-mm-dd')} className="" onChange={(e)=>{filter(e)}}/>
+                        <TextInput type="date" name="date" className="" onChange={(e)=>{filter(e)}}/>
                         <button type="button"  className="inline-flex items-center px-2 py-1 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150" onChange={(e)=>{addTask(e)}}>Add Task</button>
                     </div>
                     {/* <div>
@@ -154,26 +171,27 @@ export default function Index({ auth, tasks }) {
                             <tr>
                                 <th className="border border-slate-300">Date & Time</th>
                                 <th className="border border-slate-300">Details</th>
-                                <th className="border border-slate-300">Priority</th>
+                                {/* <th className="border border-slate-300">Priority</th> */}
                                 <th className="border border-slate-300">Status</th>
                                 {/* <th className="border border-slate-300">Remarks</th> */}
-                                <th className="border border-slate-300">Action</th>
+                                {/* <th className="border border-slate-300">Action</th> */}
                             </tr>
                         </thead>
                         <tbody>
                             {tasks.length > 0 && tasks.map((task, index) => (
-                                <tr key={index}>
+                                <tr key={index} >
                                     <td className="text-center border border-slate-300">
-                                        {task.date}
+                                        {task.date} - {formatTime(task.time)}
                                     </td>
-                                    <td className="text-left border border-slate-300">
-                                        {task.details}
+                                    <td onClick={() => editTask(task.id)} className="cursor-pointer text-left border border-slate-300">
+                                        {task.details}{" "}
+                                        <span className="bg-green-100 rounded px-1">{task.priority == 3 ? "Urgent" : task.priority == 2 ? "Moderate" : "Regular"}</span>
                                     </td>
+                                    {/* <td className="text-center border border-slate-300">
+                                        
+                                    </td> */}
                                     <td className="text-center border border-slate-300">
-                                        {task.priority == 3 ? "Urgent" : task.priority == 2 ? "Moderate" : "Regular"}
-                                    </td>
-                                    <td className="text-center border border-slate-300">
-                                        <TextInput
+                                        {/* <TextInput
                                             id="date"
                                             type="checkbox"
                                             className="mt-1 block rounded-sm text-green-600"
@@ -182,8 +200,8 @@ export default function Index({ auth, tasks }) {
                                                 updateStatus(e, task.id)
                                             }
                                             required
-                                        />
-                                        {/* {task.status == 0
+                                        /> */}
+                                        {task.status == 0
                                             ? (
                                                 <TextInput
                                                     id="date"
@@ -197,14 +215,14 @@ export default function Index({ auth, tasks }) {
                                                     isFocused
                                                 />
                                             )
-                                            : "Done"} */}
+                                            : "✅"}
                                     </td>
                                     {/* <td className="text-center border border-slate-300">
                                         {task.remarks}
                                     </td> */}
-                                    <td className="text-center border border-slate-300">
+                                    {/* <td className="text-center border border-slate-300">
                                         <button onClick={() => editTask(task.id)} className="inline-flex items-center px-2 py-1 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">Edit</button>
-                                    </td>
+                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>
@@ -217,13 +235,13 @@ export default function Index({ auth, tasks }) {
                                 Add Task <i className="fa fa-plus"></i>
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mt-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
                             <div>
-                                <InputLabel htmlFor="date" value="Date & Time" />
+                                <InputLabel htmlFor="date" value="Date" />
 
                                 <TextInput
                                     id="date"
-                                    type="datetime-local"
+                                    type="date"
                                     className="mt-1 block w-full"
                                     value={data.date ?? now()}
                                     onChange={(e) =>
@@ -237,6 +255,27 @@ export default function Index({ auth, tasks }) {
                                 <InputError
                                     className="mt-2"
                                     message={errors.date}
+                                />
+                            </div>
+                            <div>
+                                <InputLabel htmlFor="time" value="Time" />
+
+                                <TextInput
+                                    id="time"
+                                    type="time"
+                                    className="mt-1 block w-full"
+                                    value={data.time ?? new Date().toISOString().split('T')[0]}
+                                    onChange={(e) =>
+                                        setData("time", e.target.value)
+                                    }
+                                    required
+                                    isFocused
+                                    autoComplete="time"
+                                    placeholder="Time"
+                                />
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.time}
                                 />
                             </div>
                             <div className="">
