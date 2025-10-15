@@ -19,7 +19,7 @@ class TaskController extends Controller
         $tasksQuery->when($request->filled('date'), function ($query) use ($request) {
             $query->where('date', $request->date);
         });
-
+        $tasksQuery->where('created_by', auth()->id());
         $tasks = $tasksQuery->orderBy('date')->get();
 
         return Inertia::render('Task/Index', [

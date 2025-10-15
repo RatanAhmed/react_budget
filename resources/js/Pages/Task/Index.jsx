@@ -75,7 +75,7 @@ export default function Index({ auth, tasks }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 sm:p-6 lg:p-8">
                 <div className="bg-white p-4 sm:p-4 md:p-6 rounded-md border border-gray-50 shadow-md">
                     <div className="flex justify-between">
-                        <TextInput type="date" name="date" className="" onChange={(e)=>{filter(e)}}/>
+                        <TextInput type="date" name="date" value={Date('yyyy-mm-dd')} className="" onChange={(e)=>{filter(e)}}/>
                         <button type="button"  className="inline-flex items-center px-2 py-1 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150" onChange={(e)=>{addTask(e)}}>Add Task</button>
                     </div>
                     {/* <div>
