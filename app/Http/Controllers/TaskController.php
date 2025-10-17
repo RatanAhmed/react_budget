@@ -12,15 +12,18 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request):Response
+    public function index(Request $request)//:Response
     {
         $tasksQuery = Task::query();
-
+        
         $tasksQuery->when($request->filled('date'), function ($query) use ($request) {
             $query->where('date', $request->date);
         });
+        $tasksQuery->when($request->filled('status'), function ($query) use ($request) {
+            $query->where('status', $request->status);
+        });
         $tasksQuery->where('created_by', auth()->id());
-        $tasks = $tasksQuery->orderBy('date')->get();
+        $tasks = $tasksQuery->orderBy('date')->orderBy('time')->get();
 
         return Inertia::render('Task/Index', [
             'tasks' => $tasks,
@@ -43,10 +46,11 @@ class TaskController extends Controller
         
         $validated = $request->validate([
             'date'    => 'required|date',
-            'time' => 'required|date_format:H:i',
+            'time' => 'required',
             'details'   => 'required|string|max:255',
             'priority'    => 'required|numeric',
             'remarks'    => 'nullable|string',
+            'status'    => 'nullable|numeric',
         ]);
         // return $request;
         if($request->id){

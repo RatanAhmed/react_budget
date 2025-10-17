@@ -22,7 +22,7 @@ export default function Index({ auth, categories}) {
     const getData = (e) => {
         e.preventDefault();
         alert(e.target.value);
-        data = get(route('category.edit'));
+        // data = get(route('category.edit'));
     }
 
     return (
