@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {router } from "@inertiajs/react";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { X, Filter } from "lucide-react";
 import InputLabel from "@/Components/InputLabel";
 
-export default function TaskFilter({ tasks }) {
+export default function TaskFilter({ tasks, categories }) {
     const [filters, setFilters] = useState({
-        date: new Date().toISOString().split('T')[0],
-        status: "",
+        date: null,
+        status: 0,
+        task_categories_id: "",
     });
-
     const filterTasks = (e) => {
         e.preventDefault();
         router.get(route("tasks.index"), filters, {
@@ -22,14 +22,14 @@ export default function TaskFilter({ tasks }) {
         <div className="">
 
             <form onSubmit={filterTasks}>
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2 mb-2">
                     <div>
-                        <InputLabel htmlFor="date" value="Date" className="block text-sm font-medium mb-1"/>
+                        {/* <InputLabel htmlFor="date" value="Date" className="block text-sm font-medium mb-1"/> */}
                         <input
                             id="date"
                             name="date"
                             type="date"
-                            value={filters?.date}
+                            value={filters?.date || undefined}
                             onChange={(e) =>
                                 setFilters({ ...filters, date: e.target.value })
                             }
@@ -38,7 +38,7 @@ export default function TaskFilter({ tasks }) {
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="status" value="Status" className="block text-sm font-medium mb-1"/>
+                        {/* <InputLabel htmlFor="status" value="Status" className="block text-sm font-medium mb-1"/> */}
                         <select
                             id="status"
                             name="status"
@@ -55,8 +55,25 @@ export default function TaskFilter({ tasks }) {
                             <option value={3}>Cancelled</option>
                         </select>
                     </div>
+                    <div>
+                        {/* <InputLabel htmlFor="status" value="Status" className="block text-sm font-medium mb-1"/> */}
+                        <select
+                            id="task_categories_id"
+                            name="task_categories_id"
+                            value={filters?.task_categories_id}
+                            onChange={(e) =>
+                                setFilters({ ...filters, task_categories_id: e.target.value })
+                            }
+                            className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full"
+                        >
+                            <option value="">All</option>
+                            {categories?.length > 0 && categories.map((cat) => {
+                                return <option key={cat.id} value={cat?.id}>{cat?.name}</option>;
+                            })}
+                        </select>
+                    </div>
                
-                    <div className="pt-1 sm:pt-6 flex gap-2">
+                    <div className="flex gap-2">
                         <PrimaryButton>
                             <Filter size={24} />
                         </PrimaryButton>

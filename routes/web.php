@@ -9,6 +9,7 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TaskCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,7 @@ Route::group(['middleware' => ['auth', 'verified']], function() {
     Route::resource('/category', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::post('/tasks/{task}/update-status', [TaskController::class, 'updateStatus'])->name('tasks.update-status');
     Route::resource('/tasks', TaskController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('/task-categories', TaskCategoryController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
 

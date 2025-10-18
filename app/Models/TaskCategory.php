@@ -6,18 +6,14 @@ use App\Traits\AuditUserActions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Task extends Model
+class TaskCategory extends Model
 {
+    use HasFactory;
     use AuditUserActions, HasFactory;
     protected $fillable = [
-        'date', 
-        'time', 
-        'details', 
-        'priority', 
+        'name', 
         'status', 
-        'remarks', 
         'created_by', 
-        'task_categories_id', 
     ];
 
     protected $hidden = [
@@ -27,8 +23,4 @@ class Task extends Model
         'deleted_by', 
         'deleted_at', 
     ];
-
-    public function category(){
-        return $this->belongsTo(TaskCategory::class, 'task_categories_id');
-    }
 }

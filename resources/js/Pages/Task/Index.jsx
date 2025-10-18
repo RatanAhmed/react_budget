@@ -12,8 +12,9 @@ import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
 import { CirclePlus, Filter, Trash, X } from "lucide-react";
 import TaskFilter from "./TaskFilter";
+import TaskCategory from "./TaskCategory";
 
-export default function Index({ auth, tasks }) {
+export default function Index({ auth, tasks, categories }) {
     const today = new Date().toISOString().split('T')[0];
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     const { data, setData, post, processing, reset, errors } = useForm({
@@ -57,14 +58,22 @@ export default function Index({ auth, tasks }) {
     };
     
     const [modal, setModal] = useState(false);
-    const confirmUserDeletion = () => {
+    const openModal = () => {
         setModal(true);
     };
-    
     const closeModal = () => {
         setModal(false);
         reset();
     };
+
+    const [categoryModal, setCategoryModal] = useState(false);
+    const openCategoryModal = () => {
+        setCategoryModal(true);
+    };
+    const closeCategoryModal = () => {
+        setCategoryModal(false);
+    };
+ 
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Tasks" />
@@ -76,21 +85,30 @@ export default function Index({ auth, tasks }) {
                             Task List
                         </div>
                         <div>
-                            <PrimaryButton type="button" onClick={confirmUserDeletion} >
+                            <PrimaryButton type="button" onClick={openModal} >
                                 <CirclePlus  size={20} />
                             </PrimaryButton>
                         </div>
                     </div>
           
                     <div className="p-4 sm:p-6 lg:p-8">
-                        <TaskFilter></TaskFilter>
+                        <div className="flex justify-between gap-2">
+                            <div>
+                                <TaskFilter categories={categories}/>
+                            </div>
+                            <div>
+                                <PrimaryButton type="button" onClick={openCategoryModal} >
+                                    Category {"  "} <CirclePlus  size={20} />
+                                </PrimaryButton>
+                            </div>
+                        </div>
                         <div>
                             <table className="table-auto w-full text-sm">
                                 <thead>
                                     <tr>
                                         <th className="border border-slate-300">Date</th>
                                         <th className="border border-slate-300">Details</th>
-                                        {/* <th className="border border-slate-300">Priority</th> */}
+                                        <th className="border border-slate-300">Category</th>
                                         <th className="border border-slate-300">Status</th>
                                         {/* <th className="border border-slate-300">Remarks</th> */}
                                         {/* <th className="border border-slate-300">Action</th> */}
@@ -107,7 +125,7 @@ export default function Index({ auth, tasks }) {
                                                 {" "}{task.details}{" "}
                                                 <span className="bg-green-100 rounded px-1">{task.priority == 3 ? "Urgent" : task.priority == 2 ? "Moderate" : "Regular"}</span>
                                             </td>
-                                            
+                                            <td className="text-center border border-slate-300">{task?.category?.name}</td>
                                             <td className="text-center border border-slate-300">
                                                 {task.status == 1 ? "✅" : task.status == 3 ? <X size={16} className="text-red-600 bg-red-100 rounded"/>
                                                     : (
@@ -130,6 +148,9 @@ export default function Index({ auth, tasks }) {
                         </div>
                     </div>
                 </div>
+                <Modal maxWidth={'md'} show={categoryModal} onClose={closeCategoryModal}>
+                    <TaskCategory closeCategoryModal={closeCategoryModal} />
+                </Modal>
                 <Modal show={modal} onClose={closeModal}>
                     <form onSubmit={submit} className="p-4 sm:p-6">
                         <div className="flex justify-between">
@@ -182,21 +203,22 @@ export default function Index({ auth, tasks }) {
                             </div>
                             
                             <div className="">
-                                <InputLabel htmlFor="category" value="Category" />
+                                <InputLabel htmlFor="task_categories_id" value="Category" />
                                 <select
-                                    value={data.category}
+                                    value={data.task_categories_id}
                                     onChange={(e) =>
-                                        setData("category", e.target.value)
+                                        setData("task_categories_id", e.target.value)
                                     }
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                 >
-                                    <option value={1}>Personal</option>
-                                    <option value={2}>Office</option>
-                                    <option value={3}>Varsity</option>
+                                    <option value="">--------</option>
+                                    {categories?.length > 0 && categories.map((cat) => {
+                                        return <option key={cat.id} value={cat?.id}>{cat?.name}</option>;
+                                    })}
                                 </select>
 
                                 <InputError className="mt-2"
-                                    message={errors.category}
+                                    message={errors.task_categories_id}
                                 />
                             </div>
                             <div className="">
