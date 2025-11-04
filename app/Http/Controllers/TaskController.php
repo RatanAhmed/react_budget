@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskRequest;
 use App\Models\Task;
 use App\Models\TaskCategory;
 use Inertia\Inertia;
@@ -51,19 +52,20 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
         
-        $validated = $request->validate([
-            'date'    => 'required|date',
-            'time' => 'required',
-            'details'   => 'required|string|max:255',
-            'priority'    => 'required|numeric',
-            'remarks'    => 'nullable|string',
-            'status'    => 'nullable|numeric',
-            'task_categories_id' => 'nullable|numeric',
-        ]);
+        // $validated = $request->validate([
+        //     'date'    => 'required|date',
+        //     'time' => 'required',
+        //     'details'   => 'required|string|max:255',
+        //     'priority'    => 'required|numeric',
+        //     'remarks'    => 'nullable|string',
+        //     'status'    => 'nullable|numeric',
+        //     'task_categories_id' => 'nullable|numeric',
+        // ]);
         // return $request;
+        $validated = $request->validated();
         if($request->id){
             Task::find($request->id)->update($validated);
         }else{

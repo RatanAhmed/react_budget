@@ -48,7 +48,7 @@ export default function TaskFilter({ tasks, categories }) {
                             }
                             className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full"
                         >
-                            <option value="">All</option>
+                            <option value="">All Status</option>
                             <option value={0}>Pending</option>
                             <option value={1}>Completed</option>
                             <option value={2}>In Progress</option>
@@ -66,7 +66,7 @@ export default function TaskFilter({ tasks, categories }) {
                             }
                             className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full"
                         >
-                            <option value="">All</option>
+                            <option value="">All Category</option>
                             {categories?.length > 0 && categories.map((cat) => {
                                 return <option key={cat.id} value={cat?.id}>{cat?.name}</option>;
                             })}
@@ -75,7 +75,7 @@ export default function TaskFilter({ tasks, categories }) {
                
                     <div className="flex gap-2">
                         <PrimaryButton>
-                            <Filter size={24} />
+                            Filter <Filter size={24} />
                         </PrimaryButton>
                     </div>
                 </div>
