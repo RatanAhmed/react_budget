@@ -33,7 +33,10 @@ class TaskController extends Controller
         
         $tasksQuery->with(['category:id,name']);
         $tasksQuery->where('created_by', $authId);
-        $tasks = $tasksQuery->orderBy('date')->orderBy('time')->get();
+        $tasks = $tasksQuery
+            ->orderBy('status')
+            ->orderBy('date')
+            ->orderBy('time')->get();
 
         return Inertia::render('Task/Index', [
             'tasks' => $tasks,

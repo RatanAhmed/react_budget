@@ -31,4 +31,18 @@ class Task extends Model
     public function category(){
         return $this->belongsTo(TaskCategory::class, 'task_categories_id');
     }
+
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function getStatusNameAttribute(){
+        $statusName = [
+            0 => 'Pending',
+            1 => 'Completed',
+            2 => 'In Progress',
+            3 => 'Cancelled',
+        ];
+        return $statusName[$this->status] ?? null;
+    }
 }

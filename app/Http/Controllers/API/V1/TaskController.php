@@ -6,6 +6,7 @@ use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskRequest;
+use App\Http\Resources\TaskResource;
 
 class TaskController extends Controller
 {
@@ -28,10 +29,13 @@ class TaskController extends Controller
         
         $tasksQuery->with(['category:id,name']);
         $tasksQuery->where('created_by', $authId);
-        $tasks = $tasksQuery->orderBy('date')->orderBy('time')->get();
+        $tasks = $tasksQuery
+            ->orderBy('status')
+            ->orderBy('date')
+            ->orderBy('time')->get();
 
         return response()->json([
-            'tasks' => $tasks,
+            'tasks' => TaskResource::collection($tasks),
         ]);
     }
 
