@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\V1\AuthController;
+use App\Http\Controllers\API\V1\MenuController;
 use App\Http\Controllers\API\V1\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,3 +26,5 @@ Route::middleware('auth:sanctum')->name('api.v1.')->group(function () {
     
     Route::apiResource('/tasks', TaskController::class);
 });
+
+Route::apiResource('/menus', MenuController::class);
