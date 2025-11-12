@@ -27,4 +27,4 @@ Route::middleware('auth:sanctum')->name('api.v1.')->group(function () {
     Route::apiResource('/tasks', TaskController::class);
 });
 
-Route::apiResource('/menus', MenuController::class);
+Route::apiResource('/menu', MenuController::class);
