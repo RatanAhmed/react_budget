@@ -106,11 +106,15 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        if($task->delete()){
+            return redirect()->back()->with('success', 'Task deleted successfully.');
+        }else{
+            return redirect()->back()->with('error', 'Task delete failed!');
+        }
     }
     public function updateStatus(Request $request, Task $task)
     {
         $task->update(['status'=> $request->status]);
-         return redirect()->back()->with('success', 'Updated');
+        return redirect()->back()->with('success', 'Updated');
     }
 }

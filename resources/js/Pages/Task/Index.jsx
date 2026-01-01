@@ -10,14 +10,15 @@ import axios from "axios";
 import Modal from '@/Components/Modal';
 import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
-import { CirclePlus, Filter, Trash, X } from "lucide-react";
+import { CirclePlus, DeleteIcon, Filter, Trash, TrashIcon, X } from "lucide-react";
 import TaskFilter from "./TaskFilter";
 import TaskCategory from "./TaskCategory";
+import Swal from 'sweetalert2';
 
 export default function Index({ auth, tasks, categories }) {
     const today = new Date().toISOString().split('T')[0];
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-    const { data, setData, post, processing, reset, errors } = useForm({
+    const { data, setData, post, delete: destroy, processing, reset, errors } = useForm({
         id: "",
         date: today,
         time: now,
@@ -36,6 +37,34 @@ export default function Index({ auth, tasks, categories }) {
     const submit = (e) => {
         e.preventDefault();
         post(route("tasks.store"), { onSuccess: () => {reset(), setModal(false)} });
+    };
+
+    const deleteTask = (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This record will be permanently deleted.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#d33',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                destroy(route('tasks.destroy', id), {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted',
+                            text: 'The record has been deleted successfully.',
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+
+                    },
+                });
+            }
+        });
     };
 
     const updateStatus = (e, taskId, status) => {
@@ -73,7 +102,7 @@ export default function Index({ auth, tasks, categories }) {
     const closeCategoryModal = () => {
         setCategoryModal(false);
     };
- 
+
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Tasks" />
@@ -126,20 +155,24 @@ export default function Index({ auth, tasks, categories }) {
                                                 <span className="bg-green-100 rounded px-1">{task.priority == 3 ? "Urgent" : task.priority == 2 ? "Moderate" : "Regular"}</span>
                                             </td>
                                             <td className="text-center border border-slate-300">{task?.category?.name}</td>
-                                            <td className="text-center border border-slate-300">
-                                                {task.status == 1 ? "✅" : task.status == 3 ? <X size={16} className="text-red-600 bg-red-100 rounded"/>
-                                                    : (
-                                                        <div className="flex justify-between gap-3 sm:gap-6">
-                                                            <TextInput id="date" type="checkbox" className="block rounded-sm text-green-600"
-                                                                checked={task.status == 1 ? true : false}
-                                                                onChange={(e) =>
-                                                                    updateStatus(e, task.id, 1)
-                                                                }
-                                                            />
-                                                            <button onClick={(e) => updateStatus(e, task.id, 3)} className="text-red-600 bg-red-50"><X size={16} /></button>
-                                                        </div>
-                                                    )
-                                                }
+                                            <td className="text-center border border-slate-300 ">
+                                                <div className="flex gap-x-2 justify-center">
+                                                    {task.status == 1 ? "✅" : task.status == 3 ? <X size={16} className="text-red-600 bg-red-100 rounded"/>
+                                                        : (
+                                                            <div className="flex justify-between gap-3 sm:gap-6">
+                                                                <TextInput id="date" type="checkbox" className="block rounded-sm text-green-600"
+                                                                    checked={task.status == 1 ? true : false}
+                                                                    onChange={(e) =>
+                                                                        updateStatus(e, task.id, 1)
+                                                                    }
+                                                                />
+                                                                <button onClick={(e) => updateStatus(e, task.id, 3)} className="text-red-600 bg-red-50"><X size={16} /></button>
+                                                                
+                                                            </div>
+                                                        )
+                                                    }
+                                                    <TrashIcon  size={16} className="text-red-600 hover:cursor-pointer" onClick={() => deleteTask(task.id)}/>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -205,7 +238,7 @@ export default function Index({ auth, tasks, categories }) {
                             <div className="">
                                 <InputLabel htmlFor="task_categories_id" value="Category" />
                                 <select
-                                    value={data.task_categories_id}
+                                    value={data.task_categories_id ?? ''}
                                     onChange={(e) =>
                                         setData("task_categories_id", e.target.value)
                                     }
@@ -224,7 +257,7 @@ export default function Index({ auth, tasks, categories }) {
                             <div className="">
                                 <InputLabel htmlFor="priority" value="Priority" />
                                 <select
-                                    value={data.priority}
+                                    value={data.priority ?? ''}
                                     onChange={(e) =>
                                         setData("priority", e.target.value)
                                     }
