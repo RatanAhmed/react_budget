@@ -18,7 +18,7 @@ class ExpenseController extends Controller
     public function index()//:Response
     {
         return Inertia::render('Expense/Index', [
-            'expenses' => Expense::with(['income:id,source,details', 'budget:id,description', 'category:id,name'])
+            'expenses' => Expense::with(['income:id,source,details', 'budget:id,title,description', 'category:id,name'])
                         ->latest()->get(),
             'incomes' => Income::where('status', 1)->latest()->get(),
             'budgets' => Budget::where('status', 1)->latest()->get(),

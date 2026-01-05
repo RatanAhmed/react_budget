@@ -52,8 +52,8 @@ export default function Index({ auth, expenses, incomes, budgets, categories }) 
                             <td className='border border-slate-300'>{ expense.date }</td>
                             <td className='border border-slate-300'>{ expense.details }</td>
                             <td className='border border-slate-300'>{ expense.amount }</td>
-                            <td className='border border-slate-300'>{ expense?.budget?.description }</td>
-                            <td className='border border-slate-300'>{ expense?.income?.source }</td>
+                            <td className='border border-slate-300'>{ expense?.budget?.title }</td>
+                            <td className='border border-slate-300'>{ expense?.income?.details }</td>
                             <td className='border border-slate-300'>{ expense?.category?.name }</td>
                         </tr>
                         ))}
