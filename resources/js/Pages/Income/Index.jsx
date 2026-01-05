@@ -8,14 +8,15 @@ import InputLabel from "@/Components/InputLabel";
 import Dropdown from "@/Components/Dropdown";
 
 export default function Index({ auth, earnings }) {
+    const date =  new Date();
     const { data, setData, post, processing, reset, errors } = useForm({
         source: "",
         amount: "",
         details: "",
-        status: "",
-        type: "",
-        month: "",
-        year: "",
+        status: 1,
+        type: 1,
+        month: date.getMonth() +1,
+        year: date.getFullYear(),
     });
 
     const submit = (e) => {
@@ -42,7 +43,7 @@ export default function Index({ auth, earnings }) {
                         </thead>
                         <tbody>
                             {earnings.map((earning) => (
-                                <tr>
+                                <tr key={earning.id}>
                                     <td className="text-center border border-slate-300">
                                         {earning.source}
                                     </td>
@@ -152,6 +153,7 @@ export default function Index({ auth, earnings }) {
                                     onChange={(e) =>
                                         setData("status", e.target.value)
                                     }
+                                    value={data?.status}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                 >
                                     <option value="1">Active</option>
@@ -168,7 +170,7 @@ export default function Index({ auth, earnings }) {
                                 <select
                                     onChange={(e) =>
                                         setData("type", e.target.value)
-                                    }
+                                    } value={data?.type}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                 >
                                     <option value="1">Salary</option>

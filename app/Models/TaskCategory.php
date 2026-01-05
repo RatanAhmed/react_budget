@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Traits\AuditUserActions;
+use App\Models\Scopes\AuthUserScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TaskCategory extends Model
 {
-    use HasFactory;
     use AuditUserActions, HasFactory;
     protected $fillable = [
         'name', 
@@ -23,4 +23,9 @@ class TaskCategory extends Model
         'deleted_by', 
         'deleted_at', 
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new AuthUserScope);
+    }
 }

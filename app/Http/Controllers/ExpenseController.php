@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Budget;
+use App\Models\Category;
 use App\Models\Expense;
 use App\Models\Income;
 use Illuminate\Http\Request;
@@ -17,9 +18,11 @@ class ExpenseController extends Controller
     public function index()//:Response
     {
         return Inertia::render('Expense/Index', [
-            'expenses' => Expense::latest()->get(),
+            'expenses' => Expense::with(['income:id,source,details', 'budget:id,description', 'category:id,name'])
+                        ->latest()->get(),
             'incomes' => Income::where('status', 1)->latest()->get(),
             'budgets' => Budget::where('status', 1)->latest()->get(),
+            'categories' => Category::where('status', 1)->latest()->get(),
         ]);
     }
 
@@ -42,6 +45,7 @@ class ExpenseController extends Controller
             'amount'    => 'required|numeric',
             'budget_id'    => 'required|numeric',
             'income_id'      => 'required|numeric', 
+            'category_id'      => 'required|numeric|exists:categories,id', 
         ]);
         // return $request;
         Expense::create($validated);
