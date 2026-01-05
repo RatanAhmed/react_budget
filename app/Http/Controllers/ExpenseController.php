@@ -14,12 +14,13 @@ class ExpenseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index():Response
+    public function index()//:Response
     {
+        return Income::latest()->get();
         return Inertia::render('Expense/Index', [
             'expenses' => Expense::latest()->get(),
-            'incomes' => Income::whereStatus(1)->latest()->get(),
-            'budgets' => Budget::whereStatus(1)->latest()->get(),
+            'incomes' => Income::where('status', 1)->latest()->get(),
+            'budgets' => Budget::where('status', 1)->latest()->get(),
         ]);
     }
 

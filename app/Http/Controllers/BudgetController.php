@@ -31,7 +31,6 @@ class BudgetController extends Controller
      */
     public function store(Request $request)
     {
-        
         $validated = $request->validate([
             'title'    => 'required|string',
             'details'   => 'required|string',

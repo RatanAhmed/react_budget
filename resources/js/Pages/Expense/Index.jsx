@@ -9,7 +9,7 @@ import Dropdown from '@/Components/Dropdown';
 
 export default function Index({ auth, expenses, incomes, budgets }) {
     const { data, setData, post, processing, reset, errors } = useForm({
-        date: '',
+        date: new Date().toISOString().split('T')[0],
         amount: '',
         details: '',
         budget_id: '',
@@ -35,8 +35,8 @@ export default function Index({ auth, expenses, incomes, budgets }) {
                         <table className="table-auto">
                         <tbody>
                             {expenses.map((expense) => (
-                            <tr>
-                                <td className='text-center'>{ expense.key }</td>
+                            <tr key={expense.id}>
+                                <td className='text-center'>{ expense.id }</td>
                                 <td className='text-center'>{ expense.date }</td>
                                 <td className='text-center'>{ expense.details }</td>
                                 <td className='text-center'>{ expense.amount }</td>
@@ -55,12 +55,11 @@ export default function Index({ auth, expenses, incomes, budgets }) {
                             <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div>
                                     <InputLabel htmlFor="date" value="Date" />
-
                                     <TextInput
                                         id="date"
                                         type="date"
                                         className="mt-1 block w-full"
-                                        value={data.date}
+                                        value={data?.date || ''}
                                         onChange={(e) => setData('date', e.target.value)}
                                         required
                                         isFocused
@@ -76,8 +75,9 @@ export default function Index({ auth, expenses, incomes, budgets }) {
                                         id="amount"
                                         income_id="number"
                                         min="0"
+                                        type="number"
                                         className="mt-1 block w-full"
-                                        value={data.amount}
+                                        value={data?.amount}
                                         onChange={(e) => setData('amount', e.target.value)}
                                         required
                                         isFocused
@@ -107,21 +107,22 @@ export default function Index({ auth, expenses, incomes, budgets }) {
                                     onChange={(e) => setData('budget_id', e.target.value)}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
                                         <option value="0">Select</option>
-                                        {budgets.map((budget) => (
-                                            <option value="{income.value}">{budget.title}</option>
+                                        {budgets && budgets.map((budget) => (
+                                            <option key={budget.id} value="{income.value}">{budget.title}</option>
                                         ))}
                                     </select>
                                     <InputError className="mt-2" message={errors.budget_id} />
                                 </div>
                                 
                                 <div className="">
+                                    {JSON.stringify(incomes, null, 2)}
                                     <InputLabel htmlFor="income_id" value="Income Type" />
                                     <select 
                                     onChange={(e) => setData('income_id', e.target.value)}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
                                         <option value="0">Select</option>
                                         {incomes.map((income) => (
-                                            <option value="">{income.source}</option>
+                                            <option key={income.id} value="">{income.source}</option>
                                         ))}
                                     </select>
                                     <InputError className="mt-2" message={errors.income_id} />

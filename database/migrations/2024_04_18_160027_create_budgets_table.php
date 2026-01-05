@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('description')->nullable();
             $table->double('amount');
-            $table->enum('status',[0,1])->default(1);
+            $table->boolean('status')->default(1);
             $table->tinyInteger('type')->default(1)->comment('0=Once, 1=Mandatory, 2=Monthly');
             $table->tinyInteger('priority')->default(0);
             $table->tinyInteger('month')->default(0);
