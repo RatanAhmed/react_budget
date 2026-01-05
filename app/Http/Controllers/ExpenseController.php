@@ -45,7 +45,7 @@ class ExpenseController extends Controller
             'amount'    => 'required|numeric',
             'budget_id'    => 'required|numeric',
             'income_id'      => 'required|numeric', 
-            'category_id'      => 'required|numeric|exists:categories,id', 
+            'category_id'      => 'nullable|numeric|exists:categories,id', 
         ]);
         // return $request;
         Expense::create($validated);
