@@ -8,15 +8,16 @@ import InputLabel from '@/Components/InputLabel';
 import Dropdown from '@/Components/Dropdown';
 
 export default function Index({ auth, budgets }) {
+    const date = new Date();
     const { data, setData, post, processing, reset, errors } = useForm({
         title: '',
         amount: '',
         description: '',
-        status: '',
-        type: '',
-        month: '',
-        year: '',
-        // 'title', 'description', 'amount', 'status', 'type', 'priority', 'month', 'year'
+        status: 1,
+        type: '4',
+        month: date.getMonth() + 1,
+        year: date.getFullYear(),
+        priority: 1,
     });
  
     const submit = (e) => {
@@ -28,16 +29,16 @@ export default function Index({ auth, budgets }) {
  
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="budget" />
+            <Head title="Budget" />
             
             <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
                 <div className="grid grid-cols-2 gap-2 mt-2">
                     <div>
                         <table className="table-auto">
                         <tbody key="tbody">
-                            {budgets.map((key, budget) => (
-                            <tr key={key}>
-                                <td className='text-center'>{ budget.key }</td>
+                            {budgets.map((budget) => (
+                            <tr key={budget.id}>
+                                <td className='text-center'>{ budget.id }</td>
                                 <td className='text-center'>{ budget.title }</td>
                                 <td className='text-center'>{ budget.description }</td>
                                 <td className='text-center'>{ budget.amount }</td>
@@ -47,7 +48,6 @@ export default function Index({ auth, budgets }) {
                             ))}
                             </tbody>
                         </table>
-                        {JSON.stringify(errors, null, 2)}
                     </div>
                     <div>
                         <form onSubmit={submit}>
@@ -66,7 +66,7 @@ export default function Index({ auth, budgets }) {
                                         required
                                         isFocused
                                         autoComplete="title"
-                                        placeholder="title of budget"
+                                        placeholder="Title of budget"
                                     />
                                     <InputError className="mt-2" message={errors.title} />
                                 </div>
@@ -83,7 +83,7 @@ export default function Index({ auth, budgets }) {
                                         required
                                         isFocused
                                         autoComplete="amount"
-                                        placeholder="amount of budget"
+                                        placeholder="Amount of budget"
                                     />
                                     <InputError className="mt-2" message={errors.amount} />
                                 </div>
@@ -93,7 +93,7 @@ export default function Index({ auth, budgets }) {
                                 <InputLabel className="" htmlFor="description" value="Description" />
                                 <textarea
                                     value={data.description}
-                                    placeholder="description about budget"
+                                    placeholder="Description about budget"
                                     className="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                                     onChange={e => setData('description', e.target.value)}
                                 ></textarea>
@@ -104,10 +104,10 @@ export default function Index({ auth, budgets }) {
                                 <div className="">
                                     <InputLabel htmlFor="status" value="Status" />
                                     <select
-                                    required
+                                    required value={data?.status}
                                     onChange={(e) => setData('status', e.target.value)}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
-                                        <option value="1">Active</option>
+                                        <option value="1" >Active</option>
                                         <option value="0">Inactive</option>
                                     </select>
                                     <InputError className="mt-2" message={errors.status} />
@@ -116,12 +116,13 @@ export default function Index({ auth, budgets }) {
                                 <div className="">
                                     <InputLabel htmlFor="type" value="Type" />
                                     <select 
+                                    value={data?.type}
                                     onChange={(e) => setData('type', e.target.value)}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
                                         <option value="1">Once</option>
                                         <option value="2">Daily</option>
                                         <option value="3">Weekly</option>
-                                        <option value="4">Monthly</option>
+                                        <option value="4" >Monthly</option>
                                         <option value="5">Quarterly</option>
                                         <option value="6">Biannually</option>
                                         <option value="7">Annually</option>
@@ -132,6 +133,7 @@ export default function Index({ auth, budgets }) {
                                 <div className="">
                                     <InputLabel htmlFor="priority" value="Priority" />
                                     <select 
+                                    value={data?.priority}
                                     onChange={(e) => setData('priority', e.target.value)}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
                                         <option value="1">Regular</option>
@@ -155,7 +157,7 @@ export default function Index({ auth, budgets }) {
                                         onChange={(e) => setData('month', e.target.value)}
                                         isFocused
                                         autoComplete="month"
-                                        placeholder="month of budget"
+                                        placeholder="Month of budget"
                                     />
                                     <InputError className="mt-2" message={errors.month} />
                                 </div>
@@ -171,7 +173,7 @@ export default function Index({ auth, budgets }) {
                                         onChange={(e) => setData('year', e.target.value)}
                                         isFocused
                                         autoComplete="year"
-                                        placeholder="year of budget"
+                                        placeholder="Year of budget"
                                     />
                                     <InputError className="mt-2" message={errors.year} />
                                 </div> 
