@@ -16,6 +16,7 @@ export default function Index({ auth, budgets }) {
         type: '',
         month: '',
         year: '',
+        // 'title', 'description', 'amount', 'status', 'type', 'priority', 'month', 'year'
     });
  
     const submit = (e) => {
@@ -46,6 +47,7 @@ export default function Index({ auth, budgets }) {
                             ))}
                             </tbody>
                         </table>
+                        {JSON.stringify(errors, null, 2)}
                     </div>
                     <div>
                         <form onSubmit={submit}>
@@ -124,6 +126,17 @@ export default function Index({ auth, budgets }) {
                                         <option value="6">Biannually</option>
                                         <option value="7">Annually</option>
                                         <option value="0">Others</option>
+                                    </select>
+                                    <InputError className="mt-2" message={errors.type} />
+                                </div>
+                                <div className="">
+                                    <InputLabel htmlFor="priority" value="Priority" />
+                                    <select 
+                                    onChange={(e) => setData('priority', e.target.value)}
+                                    className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
+                                        <option value="1">Regular</option>
+                                        <option value="2">Urgent</option>
+                                        <option value="3">Weekly</option>
                                     </select>
                                     <InputError className="mt-2" message={errors.type} />
                                 </div>

@@ -16,7 +16,6 @@ class ExpenseController extends Controller
      */
     public function index()//:Response
     {
-        return Income::latest()->get();
         return Inertia::render('Expense/Index', [
             'expenses' => Expense::latest()->get(),
             'incomes' => Income::where('status', 1)->latest()->get(),
@@ -38,13 +37,11 @@ class ExpenseController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'source'    => 'required|string',
+            'date'    => 'required|string',
             'details'   => 'required|string',
             'amount'    => 'required|numeric',
-            'status'    => 'required|numeric',
-            'type'      => 'required|numeric', 
-            // 'month'     => '',
-            // 'year'      => '', 
+            'budget_id'    => 'required|numeric',
+            'income_id'      => 'required|numeric', 
         ]);
         // return $request;
         Expense::create($validated);

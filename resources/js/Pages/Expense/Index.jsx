@@ -46,6 +46,7 @@ export default function Index({ auth, expenses, incomes, budgets }) {
                             ))}
                             </tbody>
                         </table>
+                        {JSON.stringify(data, null, 2)}
                     </div>
                     <div>
                         <form onSubmit={submit}>
@@ -106,62 +107,26 @@ export default function Index({ auth, expenses, incomes, budgets }) {
                                     required
                                     onChange={(e) => setData('budget_id', e.target.value)}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
-                                        <option value="0">Select</option>
+                                        <option value="0" >Select</option>
                                         {budgets && budgets.map((budget) => (
-                                            <option key={budget.id} value="{income.value}">{budget.title}</option>
+                                            <option key={budget.id} value={budget.id}>{budget.title}</option>
                                         ))}
                                     </select>
                                     <InputError className="mt-2" message={errors.budget_id} />
                                 </div>
                                 
                                 <div className="">
-                                    {JSON.stringify(incomes, null, 2)}
                                     <InputLabel htmlFor="income_id" value="Income Type" />
                                     <select 
                                     onChange={(e) => setData('income_id', e.target.value)}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
-                                        <option value="0">Select</option>
+                                        <option value="0" >Select</option>
                                         {incomes.map((income) => (
-                                            <option key={income.id} value="">{income.source}</option>
+                                            <option key={income.id} value={income.id}>{income.details}</option>
                                         ))}
                                     </select>
                                     <InputError className="mt-2" message={errors.income_id} />
                                 </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 mt-2">
-                                
-                                <div>
-                                    <InputLabel htmlFor="month" value="Month" />
-
-                                    <TextInput
-                                        id="month"
-                                        income_id="number"
-                                        min="1" max="12"
-                                        className="mt-1 block w-full"
-                                        value={data.month}
-                                        onChange={(e) => setData('month', e.target.value)}
-                                        isFocused
-                                        autoComplete="month"
-                                        placeholder="month of expense"
-                                    />
-                                    <InputError className="mt-2" message={errors.month} />
-                                </div>
-                                <div>
-                                    <InputLabel htmlFor="year" value="Year" />
-
-                                    <TextInput
-                                        id="year"
-                                        income_id="number"
-                                        min="2024" max="2030"
-                                        className="mt-1 block w-full"
-                                        value={data.year}
-                                        onChange={(e) => setData('year', e.target.value)}
-                                        isFocused
-                                        autoComplete="year"
-                                        placeholder="year of expense"
-                                    />
-                                    <InputError className="mt-2" message={errors.year} />
-                                </div> 
                             </div>
                             <div className="grid justify-items-end mt-4">
                                 <PrimaryButton className="mt-4" disabled={processing}>Submit</PrimaryButton>

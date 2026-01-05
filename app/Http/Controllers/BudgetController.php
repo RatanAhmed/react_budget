@@ -33,10 +33,13 @@ class BudgetController extends Controller
     {
         $validated = $request->validate([
             'title'    => 'required|string',
-            'details'   => 'required|string',
+            'description'   => 'required|string',
             'amount'    => 'required|numeric',
             'status'    => 'required|numeric',
             'type'      => 'required|numeric', 
+            'priority' => 'required|numeric',
+            'month' => 'required|numeric',
+            'year' => 'required|numeric',
         ]);
         // return $request;
         Budget::create($validated);
