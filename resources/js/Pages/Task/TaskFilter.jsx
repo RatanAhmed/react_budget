@@ -4,9 +4,9 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import { X, Filter } from "lucide-react";
 import InputLabel from "@/Components/InputLabel";
 
-export default function TaskFilter({ tasks, categories }) {
+export default function TaskFilter({ tasks, categories, today }) {
     const [filters, setFilters] = useState({
-        date: null,
+        date: today,
         status: 0,
         task_categories_id: "",
     });

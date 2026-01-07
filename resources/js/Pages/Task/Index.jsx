@@ -123,7 +123,7 @@ export default function Index({ auth, tasks, categories }) {
                     <div className="p-4 sm:p-6 lg:p-8">
                         <div className="flex justify-between gap-2">
                             <div>
-                                <TaskFilter categories={categories}/>
+                                <TaskFilter categories={categories} today = {today}/>
                             </div>
                             <div>
                                 <PrimaryButton type="button" onClick={openCategoryModal} >

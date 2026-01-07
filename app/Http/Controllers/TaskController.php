@@ -26,10 +26,8 @@ class TaskController extends Controller
         $tasksQuery->when($request->filled('task_categories_id'), function ($query) use ($request) {
             $query->where('task_categories_id', $request->task_categories_id);
         });
-
-        $tasksQuery->when( $request->filled('status'), function ($query) use ($request) {
-            $query->where('status', $request->status);
-        });
+        
+        $tasksQuery->where('status', $request->input('status', 0));
         
         $tasksQuery->with(['category:id,name']);
         $tasksQuery->where('created_by', $authId);

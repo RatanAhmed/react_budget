@@ -36,12 +36,12 @@ export default function Index({ auth, budgets }) {
                     <table className="table-auto w-full">
                         <thead>
                             <tr>
-                                <th className="border border-slate-300">Source</th>
-                                <th className="border border-slate-300">Details</th>
+                                <th className="border border-slate-300">Id</th>
+                                <th className="border border-slate-300">Title</th>
+                                <th className="border border-slate-300">Description</th>
                                 <th className="border border-slate-300">Amount</th>
                                 <th className="border border-slate-300">Status</th>
                                 <th className="border border-slate-300">Type</th>
-                                <th className="border border-slate-300">Action</th>
                             </tr>
                         </thead>
                         <tbody key="tbody">
