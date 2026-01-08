@@ -54,13 +54,13 @@ export default function Index({ auth, tasks, categories }) {
                     preserveScroll: true,
                     onSuccess: () => {
                         Swal.fire({
+                            position: "top-end",
                             icon: 'success',
                             title: 'Deleted',
-                            text: 'The record has been deleted successfully.',
+                            text: html(`<small>The record has been deleted successfully.</small>`),
                             timer: 1500,
                             showConfirmButton: false,
                         });
-
                     },
                 });
             }
