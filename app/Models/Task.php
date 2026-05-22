@@ -11,33 +11,36 @@ class Task extends Model
 {
     use AuditUserActions, HasFactory;
     protected $fillable = [
-        'date', 
-        'time', 
-        'details', 
-        'priority', 
-        'status', 
-        'remarks', 
-        'created_by', 
-        'task_categories_id', 
+        'date',
+        'time',
+        'details',
+        'priority',
+        'status',
+        'remarks',
+        'created_by',
+        'task_categories_id',
     ];
 
     protected $hidden = [
-        'created_at', 
-        'updated_at', 
-        'updated_by', 
-        'deleted_by', 
-        'deleted_at', 
+        'created_at',
+        'updated_at',
+        'updated_by',
+        'deleted_by',
+        'deleted_at',
     ];
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(TaskCategory::class, 'task_categories_id');
     }
 
-    public function createdBy(){
+    public function createdBy()
+    {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function getStatusNameAttribute(){
+    public function getStatusNameAttribute()
+    {
         $statusName = [
             0 => 'Pending',
             1 => 'Completed',
@@ -50,5 +53,14 @@ class Task extends Model
     protected static function booted()
     {
         static::addGlobalScope(new AuthUserScope);
+    }
+
+    public function schedule()
+    {
+        return $this->hasOne(TaskSchedule::class);
+    }
+    public function logs()
+    {
+        return $this->hasMany(TaskLog::class);
     }
 }

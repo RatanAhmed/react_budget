@@ -4,9 +4,9 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import { X, Filter } from "lucide-react";
 import InputLabel from "@/Components/InputLabel";
 
-export default function ExpenseFilter({ today, incomes, budgets, categories }) {
+export default function ExpenseFilter({ incomes, budgets, categories }) {
     const [filters, setFilters] = useState({
-        date: today,
+        date: "",
         category_id: "",
         income_id: "",
         budget_id: "",
@@ -16,6 +16,7 @@ export default function ExpenseFilter({ today, incomes, budgets, categories }) {
         router.get(route("expense.index"), filters, {
             preserveState: true,
             preserveScroll: true,
+            replace: true,
         });
     };
 
