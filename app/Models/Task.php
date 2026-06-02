@@ -19,11 +19,20 @@ class Task extends Model
         'remarks',
         'created_by',
         'task_categories_id',
+        'is_recurring',
+        'end_date',
+        'end_time',
     ];
 
+    protected $casts = [
+        'is_recurring' => 'boolean',
+        'date'         => 'date',
+        'end_date'     => 'date',
+    ];
+
+    protected $appends = ['status_name', 'frequency_label'];
+
     protected $hidden = [
-        'created_at',
-        'updated_at',
         'updated_by',
         'deleted_by',
         'deleted_at',
@@ -48,6 +57,11 @@ class Task extends Model
             3 => 'Cancelled',
         ];
         return $statusName[$this->status] ?? null;
+    }
+
+    public function getFrequencyLabelAttribute(): ?string
+    {
+        return $this->schedule?->frequency_label;
     }
 
     protected static function booted()

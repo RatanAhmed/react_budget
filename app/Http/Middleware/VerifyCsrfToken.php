@@ -12,6 +12,8 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'payment/ipn/*',
+        'payment/callback/*',
+        'resume/*/download/callback/*',  // Payment gateway POSTs to resume download callback
     ];
 }

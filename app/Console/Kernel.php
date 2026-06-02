@@ -7,21 +7,19 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * Define the application's command schedule.
-     */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Generate recurring task instances every day at midnight
+        // Looks 7 days ahead so tasks are ready before the day starts
+        $schedule->command('tasks:generate-recurring --days=7')
+                 ->dailyAt('00:05')
+                 ->withoutOverlapping()
+                 ->runInBackground();
     }
 
-    /**
-     * Register the commands for the application.
-     */
     protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
-
         require base_path('routes/console.php');
     }
 }

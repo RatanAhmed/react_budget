@@ -18,10 +18,18 @@ class ExpenseController extends Controller
     {
         $authId = auth()->id();
         $query = Expense::query();
-        
-        $query->when($request->filled('date'), function ($query) use ($request) {
-            $query->where('date', $request->date);
-        });
+
+        // ── Date range filter (date_from / date_to) ───────────────────────────
+        // Default to current month when neither is supplied
+        $dateFrom = $request->filled('date_from')
+            ? $request->date_from
+            : now()->startOfMonth()->toDateString();
+
+        $dateTo = $request->filled('date_to')
+            ? $request->date_to
+            : now()->endOfMonth()->toDateString();
+
+        $query->whereBetween('date', [$dateFrom, $dateTo]);
 
         $query->when($request->filled('budget_id'), function ($query) use ($request) {
             $query->where('budget_id', $request->budget_id);
@@ -29,17 +37,26 @@ class ExpenseController extends Controller
         $query->when($request->filled('income_id'), function ($query) use ($request) {
             $query->where('income_id', $request->income_id);
         });
-        
+        $query->when($request->filled('category_id'), function ($query) use ($request) {
+            $query->where('category_id', $request->category_id);
+        });
+
         $query->with(['income:id,source,details', 'budget:id,title,description', 'category:id,name']);
         $query->where('created_by', $authId);
         $expenses = $query->orderByDesc('date')->paginate(15)->withQueryString();
-        // Expense::with(['income:id,source,details', 'budget:id,title,description', 'category:id,name'])
-        //                 ->orderBy('date','desc')->get();
+
         return Inertia::render('Expense/Index', [
-            'expenses' => $expenses,
-            'incomes' => Income::where('status', 1)->latest()->get(),
-            'budgets' => Budget::where('status', 1)->latest()->get(),
-            'categories' => Category::where('status', 1)->latest()->get(),
+            'expenses'   => $expenses,
+            'incomes'    => Income::where('status', 1)->latest()->get(),
+            'budgets'    => Budget::where('status', 1)->latest()->get(),
+            'categories' => Category::where('status', 1)->where('type', 0)->latest()->get(),
+            'filters'    => [
+                'date_from'   => $dateFrom,
+                'date_to'     => $dateTo,
+                'income_id'   => $request->income_id ?? '',
+                'budget_id'   => $request->budget_id ?? '',
+                'category_id' => $request->category_id ?? '',
+            ],
         ]);
     }
 
@@ -62,16 +79,40 @@ class ExpenseController extends Controller
         // ── Edit existing record ──────────────────────────────────────────────
         if ($request->filled('id')) {
             $validated = $request->validate([
-                'id'          => 'required|numeric|exists:expenses,id',
-                'date'        => 'required|date',
-                'details'     => 'required|string|max:500',
-                'amount'      => 'required|numeric|min:0',
-                'budget_id'   => 'nullable|numeric|exists:budgets,id',
-                'income_id'   => 'nullable|numeric|exists:incomes,id',
-                'category_id' => 'nullable|numeric|exists:categories,id',
+                'id'                        => 'required|numeric|exists:expenses,id',
+                'date'                      => 'required|date',
+                'details'                   => 'required|string|max:500',
+                'amount'                    => 'required|numeric|min:0',
+                'budget_id'                 => 'nullable|numeric|exists:budgets,id',
+                'income_id'                 => 'nullable|numeric|exists:incomes,id',
+                'category_id'               => 'nullable|numeric|exists:categories,id',
+                'extra_items'               => 'nullable|array',
+                'extra_items.*.details'     => 'required_with:extra_items|string|max:500',
+                'extra_items.*.amount'      => 'required_with:extra_items|numeric|min:0',
+                'extra_items.*.category_id' => 'nullable|numeric|exists:categories,id',
             ]);
 
-            Expense::find($validated['id'])->update($validated);
+            Expense::find($validated['id'])->update([
+                'date'        => $validated['date'],
+                'details'     => $validated['details'],
+                'amount'      => $validated['amount'],
+                'budget_id'   => $validated['budget_id'] ?? null,
+                'income_id'   => $validated['income_id'] ?? null,
+                'category_id' => $validated['category_id'] ?? null,
+            ]);
+
+            // Create any extra rows added during edit
+            foreach ($validated['extra_items'] ?? [] as $item) {
+                Expense::create([
+                    'date'        => $validated['date'],
+                    'income_id'   => $validated['income_id'] ?? null,
+                    'budget_id'   => $validated['budget_id'] ?? null,
+                    'details'     => $item['details'],
+                    'amount'      => $item['amount'],
+                    'category_id' => $item['category_id'] ?? null,
+                ]);
+            }
+
             return redirect()->route('expense.index');
         }
 

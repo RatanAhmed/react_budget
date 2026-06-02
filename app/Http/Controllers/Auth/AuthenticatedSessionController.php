@@ -17,8 +17,13 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        // Store the intended redirect URL so Laravel can redirect after login
+        if ($request->has('redirect')) {
+            session()->put('url.intended', $request->input('redirect'));
+        }
+
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),

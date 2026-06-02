@@ -33,12 +33,28 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        // ── Edit existing ─────────────────────────────────────────────────────
+        if ($request->filled('id')) {
+            $validated = $request->validate([
+                'id'     => 'required|numeric|exists:categories,id',
+                'name'   => 'required|string',
+                'type'   => 'required|numeric',
+                'status' => 'required|numeric',
+            ]);
+            Category::find($validated['id'])->update([
+                'name'   => $validated['name'],
+                'type'   => $validated['type'],
+                'status' => $validated['status'],
+            ]);
+            return redirect()->route('category.index');
+        }
+
+        // ── Create ────────────────────────────────────────────────────────────
         $validated = $request->validate([
             'name'   => 'required|string',
             'type'   => 'required|numeric',
             'status' => 'required|numeric',
         ]);
-        // return $request;
         Category::create($validated);
         return redirect()->route('category.index');
     }

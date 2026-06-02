@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
-// Nav items config — add/remove entries here
+// Nav items — each can optionally require a service slug permission
 const NAV_ITEMS = [
     {
         label: 'Dashboard',
@@ -15,35 +15,9 @@ const NAV_ITEMS = [
         ),
     },
     {
-        label: 'Earning',
-        routeName: 'income.index',
-        icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        ),
-    },
-    {
-        label: 'Budget',
-        routeName: 'budget.index',
-        icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-        ),
-    },
-    {
-        label: 'Category',
-        routeName: 'category.index',
-        icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-        ),
-    },
-    {
         label: 'Expenses',
         routeName: 'expense.index',
+        service: 'budget-planner',
         icon: (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -53,17 +27,68 @@ const NAV_ITEMS = [
     {
         label: 'Tasks',
         routeName: 'tasks.index',
+        service: 'task-manager',
         icon: (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
         ),
     },
+    {
+        label: 'Resume',
+        routeName: 'resume.index',
+        service: 'resume-builder',
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        ),
+    },
+    {
+        label: 'Settings',
+        routeName: 'settings.index',
+        service: 'budget-planner',
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        ),
+    },
+    {
+        label: 'Loans',
+        routeName: 'loans.index',
+        service: 'budget-planner',
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+        ),
+    },
 ];
 
 // A single sidebar nav link
-function SideNavLink({ item, onClick }) {
+function SideNavLink({ item, permissions, onClick }) {
     const isActive = route().current(item.routeName);
+    const isWildcard = permissions.includes('*');
+    const hasAccess = !item.service || isWildcard || permissions.includes(item.service);
+
+    if (!hasAccess) {
+        // Locked item — show greyed out with lock icon
+        return (
+            <Link
+                href={route('pricing')}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-700/50 hover:text-gray-300 transition-colors group"
+                title="Upgrade to unlock"
+            >
+                <span className="text-gray-600">{item.icon}</span>
+                <span className="flex-1">{item.label}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-600 group-hover:text-yellow-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </Link>
+        );
+    }
 
     return (
         <Link
@@ -82,7 +107,7 @@ function SideNavLink({ item, onClick }) {
 }
 
 // Sidebar content — shared between desktop and mobile drawer
-function SidebarContent({ user, onNavClick }) {
+function SidebarContent({ user, permissions, isAdmin, onNavClick }) {
     return (
         <div className="flex flex-col h-full">
             {/* Logo */}
@@ -96,14 +121,28 @@ function SidebarContent({ user, onNavClick }) {
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
                 {NAV_ITEMS.map((item) => (
-                    <SideNavLink key={item.routeName} item={item} onClick={onNavClick} />
+                    <SideNavLink key={item.routeName} item={item} permissions={permissions} onClick={onNavClick} />
                 ))}
+
+                {/* Admin panel link */}
+                {isAdmin && (
+                    <div className="pt-4 mt-4 border-t border-gray-700">
+                        <Link
+                            href={route('admin.dashboard')}
+                            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-rose-400 hover:bg-gray-700 hover:text-rose-300 transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            Admin Panel
+                        </Link>
+                    </div>
+                )}
             </nav>
 
             {/* User section at bottom */}
             <div className="border-t border-gray-700 px-4 py-4">
                 <div className="flex items-center gap-3 mb-3">
-                    {/* Avatar placeholder */}
                     <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm font-semibold shrink-0">
                         {user.name.charAt(0).toUpperCase()}
                     </div>
@@ -113,6 +152,15 @@ function SidebarContent({ user, onNavClick }) {
                     </div>
                 </div>
                 <div className="flex flex-col gap-1">
+                    <Link
+                        href={route('subscription.index')}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        </svg>
+                        My Plan
+                    </Link>
                     <Link
                         href={route('profile.edit')}
                         className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
@@ -140,6 +188,9 @@ function SidebarContent({ user, onNavClick }) {
 }
 
 export default function Authenticated({ user, header, children }) {
+    const { auth } = usePage().props;
+    const permissions = auth.permissions ?? [];
+    const isAdmin     = auth.role === 'admin';
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const closeSidebar = () => setSidebarOpen(false);
@@ -149,7 +200,7 @@ export default function Authenticated({ user, header, children }) {
 
             {/* ── Desktop Sidebar (always visible ≥ lg) ── */}
             <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-gray-800 z-30">
-                <SidebarContent user={user} onNavClick={undefined} />
+                <SidebarContent user={user} permissions={permissions} isAdmin={isAdmin} onNavClick={undefined} />
             </aside>
 
             {/* ── Mobile Sidebar Drawer ── */}
@@ -179,7 +230,7 @@ export default function Authenticated({ user, header, children }) {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-                <SidebarContent user={user} onNavClick={closeSidebar} />
+                <SidebarContent user={user} permissions={permissions} isAdmin={isAdmin} onNavClick={closeSidebar} />
             </aside>
 
             {/* ── Main content area ── */}
@@ -225,6 +276,7 @@ export default function Authenticated({ user, header, children }) {
                                     </button>
                                 </Dropdown.Trigger>
                                 <Dropdown.Content>
+                                    <Dropdown.Link href={route('subscription.index')}>My Plan</Dropdown.Link>
                                     <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
                                     <Dropdown.Link href={route('logout')} method="post" as="button">
                                         Log Out
