@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             ResumeTemplateSeeder::class,
             PaymentGatewaySeeder::class,
             PlanSeeder::class,
+            DefaultAccountSeeder::class,
         ]);
     }
 }
