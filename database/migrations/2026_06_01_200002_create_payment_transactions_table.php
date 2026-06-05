@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('payment_transactions', function (Blueprint $table) {
             $table->id();
             $table->string('txn_id')->unique();              // internal transaction ID
-            $table->string('gateway_slug');                  // bkash | nagad | card | cash
+            $table->string('gateway_slug', 50);                 // bkash | nagad | card | cash
             $table->foreignId('gateway_id')->constrained('payment_gateways')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 
@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->decimal('amount', 12, 2);
             $table->string('currency', 10)->default('BDT');
-            $table->string('status')->default('pending');    // pending | completed | failed | refunded | cancelled
+            $table->string('status', 20)->default('pending');   // pending | completed | failed | refunded | cancelled
             $table->string('gateway_txn_id')->nullable();    // gateway's own transaction ID
             $table->string('gateway_ref')->nullable();       // payment reference / trxID
             $table->string('phone')->nullable();             // mobile number for bKash/Nagad
