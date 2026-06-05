@@ -11,22 +11,26 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Admin user
-        User::create([
-            'name'              => 'Admin',
-            'email'             => 'admin@bp.com',
-            'password'          => Hash::make('ratan123'),
-            'role'              => 'admin',
-            'email_verified_at' => now(),
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@bp.com'],
+            [
+                'name'              => 'Admin',
+                'password'          => Hash::make('ratan123'),
+                'role'              => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
 
         // Regular user
-        User::create([
-            'name'              => 'Ratan',
-            'email'             => 'ratan@bp.com',
-            'password'          => Hash::make('ratan123'),
-            'role'              => 'user',
-            'email_verified_at' => now(),
-        ]);
+        User::updateOrCreate(
+            ['email' => 'ratan@bp.com'],
+            [
+                'name'              => 'Ratan',
+                'password'          => Hash::make('ratan123'),
+                'role'              => 'user',
+                'email_verified_at' => now(),
+            ]
+        );
 
         $this->call([
             ServiceSeeder::class,
@@ -34,6 +38,7 @@ class DatabaseSeeder extends Seeder
             PaymentGatewaySeeder::class,
             PlanSeeder::class,
             DefaultAccountSeeder::class,
+            DefaultCategorySeeder::class,
         ]);
     }
 }
