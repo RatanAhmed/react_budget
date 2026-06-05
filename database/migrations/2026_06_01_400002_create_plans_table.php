@@ -16,7 +16,9 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->default(0);
             $table->enum('billing_cycle', ['monthly', 'yearly', 'lifetime'])->default('monthly');
             $table->integer('trial_days')->default(0);
-            $table->json('features')->nullable();   // marketing bullet points
+            $table->unsignedSmallInteger('duration_value')->nullable(); // NULL = lifetime (never expires)
+            $table->enum('duration_unit', ['days', 'months', 'years'])->default('months');
+            $table->json('features')->nullable();
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
             $table->timestamps();

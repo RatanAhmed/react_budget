@@ -1,14 +1,14 @@
 <?php
 
+use App\Traits\AuditableColumns;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    use AuditableColumns;
+
     public function up(): void
     {
         Schema::create('savings', function (Blueprint $table) {
@@ -16,16 +16,14 @@ return new class extends Migration
             $table->date('date');
             $table->string('details')->nullable();
             $table->double('amount');
-            $table->tinyInteger('budget_id');
-            $table->tinyInteger('income_id');
+            $table->unsignedBigInteger('budget_id')->nullable();
+            $table->unsignedBigInteger('income_id')->nullable();
             $table->string('saving_for')->nullable();
             $table->timestamps();
+            $this->addAuditingColumns($table);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('savings');

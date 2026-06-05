@@ -1,14 +1,14 @@
 <?php
 
+use App\Traits\AuditableColumns;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    use AuditableColumns;
+
     public function up(): void
     {
         Schema::create('budgets', function (Blueprint $table) {
@@ -20,14 +20,12 @@ return new class extends Migration
             $table->tinyInteger('type')->default(1)->comment('0=Once, 1=Mandatory, 2=Monthly');
             $table->tinyInteger('priority')->default(0);
             $table->tinyInteger('month')->default(0);
-            $table->tinyInteger('year')->default(0);
+            $table->integer('year')->default(0);
             $table->timestamps();
+            $this->addAuditingColumns($table);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('budgets');

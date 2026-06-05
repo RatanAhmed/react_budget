@@ -8,25 +8,29 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     use AuditableColumns;
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('task_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->boolean('status')->default(true);
-            $this->addAuditingColumns($table);
             $table->timestamps();
+            $this->addAuditingColumns($table);
+        });
+
+        // Now that task_categories exists, add the FK on tasks
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->foreign('task_categories_id')->references('id')->on('task_categories');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->dropForeign(['task_categories_id']);
+        });
+
         Schema::dropIfExists('task_categories');
     }
 };

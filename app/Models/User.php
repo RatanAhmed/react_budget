@@ -16,8 +16,14 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'mobile',
+        'mobile_verified_at',
         'password',
         'role',
+        'google_id',
+        'facebook_id',
+        'auth_provider',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -26,8 +32,9 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password'          => 'hashed',
+        'email_verified_at'  => 'datetime',
+        'mobile_verified_at' => 'datetime',
+        'password'           => 'hashed',
     ];
 
     // ── Relationships ─────────────────────────────────────────────────────────
@@ -47,6 +54,23 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->role === 'user';
+    }
+
+    /**
+     * Returns true if the user can log in with a password
+     * (i.e. they registered via email or have set a password).
+     */
+    public function hasPassword(): bool
+    {
+        return ! is_null($this->password);
+    }
+
+    /**
+     * Returns true if the user's mobile number is verified.
+     */
+    public function hasMobileVerified(): bool
+    {
+        return ! is_null($this->mobile_verified_at);
     }
 
     // ── Subscription helpers ──────────────────────────────────────────────────
