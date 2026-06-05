@@ -47,7 +47,7 @@ class PaymentGatewayController extends Controller
 
         PaymentGateway::create($validated);
 
-        return redirect()->route('payment-gateways.index')
+        return redirect()->route('admin.payment-gateways.index')
             ->with('success', 'Gateway created.');
     }
 
@@ -72,21 +72,21 @@ class PaymentGatewayController extends Controller
 
         $paymentGateway->update($validated);
 
-        return redirect()->route('payment-gateways.index')
+        return redirect()->route('admin.payment-gateways.index')
             ->with('success', 'Gateway updated.');
     }
 
     public function destroy(PaymentGateway $paymentGateway)
     {
         $paymentGateway->delete();
-        return redirect()->route('payment-gateways.index')
+        return redirect()->route('admin.payment-gateways.index')
             ->with('success', 'Gateway removed.');
     }
 
     public function restore(int $id)
     {
         PaymentGateway::withTrashed()->findOrFail($id)->restore();
-        return redirect()->route('payment-gateways.index')
+        return redirect()->route('admin.payment-gateways.index')
             ->with('success', 'Gateway restored.');
     }
 }

@@ -83,11 +83,11 @@ export default function GatewayConfig({ auth, gateways }) {
         payload.credentials = Object.keys(creds).length ? creds : undefined;
 
         if (editing) {
-            router.put(route('payment-gateways.update', editing.id), payload, {
+            router.put(route('admin.payment-gateways.update', editing.id), payload, {
                 onFinish: () => { setProcessing(false); closeModal(); },
             });
         } else {
-            router.post(route('payment-gateways.store'), payload, {
+            router.post(route('admin.payment-gateways.store'), payload, {
                 onFinish: () => { setProcessing(false); closeModal(); },
             });
         }
@@ -95,11 +95,11 @@ export default function GatewayConfig({ auth, gateways }) {
 
     const destroy = (gw) => {
         if (!confirm(`Remove ${gw.name}?`)) return;
-        router.delete(route('payment-gateways.destroy', gw.id));
+        router.delete(route('admin.payment-gateways.destroy', gw.id));
     };
 
     const restore = (gw) => {
-        router.post(route('payment-gateways.restore', gw.id));
+        router.post(route('admin.payment-gateways.restore', gw.id));
     };
 
     const credFields = GATEWAY_CREDENTIAL_FIELDS[form.slug] ?? [];

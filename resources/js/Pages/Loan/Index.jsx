@@ -35,7 +35,7 @@ function StatusBadge({ status, overdue }) {
 
 // ── Loan form modal ───────────────────────────────────────────────────────────
 
-function LoanFormModal({ show, onClose, loanType, editLoan }) {
+function LoanFormModal({ show, onClose, loanType, editLoan, accounts }) {
     const isEdit = !!editLoan;
     // Use editLoan.type when editing so the correct type is preserved
     const resolvedType = editLoan?.type ?? loanType;
@@ -48,6 +48,7 @@ function LoanFormModal({ show, onClose, loanType, editLoan }) {
         note:         editLoan?.note         ?? '',
         loan_date:    editLoan?.loan_date    ?? today(),
         due_date:     editLoan?.due_date     ?? '',
+        account_id:   accounts?.[0]?.id ?? '',
     });
 
     function submit(e) {
@@ -99,6 +100,17 @@ function LoanFormModal({ show, onClose, loanType, editLoan }) {
                             placeholder="0.00" required />
                         <InputError className="mt-1" message={errors.amount} />
                     </div>
+                    {!isEdit && (
+                        <div>
+                            <InputLabel value="Account *" />
+                            <select value={data.account_id} onChange={e => setData('account_id', e.target.value)}
+                                className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" required={!isEdit}>
+                                <option value="">— Select account —</option>
+                                {accounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                            </select>
+                            <InputError className="mt-1" message={errors.account_id} />
+                        </div>
+                    )}
                     <div>
                         <InputLabel value="Loan Date *" />
                         <TextInput type="date" className="mt-1 block w-full"
@@ -143,11 +155,12 @@ function LoanFormModal({ show, onClose, loanType, editLoan }) {
 
 // ── Repayment form modal ──────────────────────────────────────────────────────
 
-function RepaymentModal({ show, onClose, loan }) {
+function RepaymentModal({ show, onClose, loan, accounts }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         amount:          '',
         note:            '',
         repayment_date:  today(),
+        account_id:      accounts?.[0]?.id ?? '',
     });
 
     function submit(e) {
@@ -177,6 +190,15 @@ function RepaymentModal({ show, onClose, loan }) {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <InputLabel value="Account *" />
+                        <select value={data.account_id} onChange={e => setData('account_id', e.target.value)}
+                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" required>
+                            <option value="">— Select account —</option>
+                            {accounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                        </select>
+                        <InputError className="mt-1" message={errors.account_id} />
+                    </div>
                     <div>
                         <InputLabel value="Amount *" />
                         <TextInput type="number" min="0.01" step="0.01" max={outstanding}
@@ -373,7 +395,7 @@ function LoanCard({ loan, onRepay, onEdit }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export default function LoanIndex({ auth, loans, summary, filters }) {
+export default function LoanIndex({ auth, loans, summary, filters, accounts }) {
     const { flash } = usePage().props;
 
     const [tab, setTab]             = useState(filters.type ?? 'lend');
@@ -524,12 +546,14 @@ export default function LoanIndex({ auth, loans, summary, filters }) {
                 onClose={() => { setLoanModal(false); setEditLoan(null); }}
                 loanType={tab}
                 editLoan={editLoan}
+                accounts={accounts}
             />
             <RepaymentModal
                 key={repayModal ? (repayTarget?.id ?? 'repay') : 'closed'}
                 show={repayModal}
                 onClose={() => { setRepayModal(false); setRepayTarget(null); }}
                 loan={repayTarget}
+                accounts={accounts}
             />
         </AuthenticatedLayout>
     );

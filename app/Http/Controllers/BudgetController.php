@@ -114,6 +114,43 @@ class BudgetController extends Controller
     }
 
     /**
+     * Bulk create multiple budgets at once.
+     */
+    public function storeBulk(Request $request)
+    {
+        $request->validate([
+            'items'                  => 'required|array|min:1',
+            'items.*.title'          => 'required|string|max:255',
+            'items.*.amount'         => 'required|numeric|min:0',
+            'items.*.description'    => 'required|string|max:500',
+            'items.*.type'           => 'required|numeric',
+            'items.*.priority'       => 'required|numeric',
+            'items.*.status'         => 'required|numeric',
+            'items.*.month'          => 'required|numeric|min:1|max:12',
+            'items.*.year'           => 'required|numeric|min:2020|max:2035',
+        ]);
+
+        $month = $request->items[0]['month'];
+        $year  = $request->items[0]['year'];
+
+        foreach ($request->items as $item) {
+            Budget::create([
+                'title'       => $item['title'],
+                'description' => $item['description'],
+                'amount'      => $item['amount'],
+                'status'      => $item['status'],
+                'type'        => $item['type'],
+                'priority'    => $item['priority'],
+                'month'       => $item['month'],
+                'year'        => $item['year'],
+            ]);
+        }
+
+        return redirect()->route('budget.index', compact('month', 'year'))
+            ->with('success', count($request->items) . ' budget(s) created.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Budget $budget)

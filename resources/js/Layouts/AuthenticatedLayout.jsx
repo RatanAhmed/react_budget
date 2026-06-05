@@ -15,8 +15,18 @@ const NAV_ITEMS = [
         ),
     },
     {
-        label: 'Expenses',
-        routeName: 'expense.index',
+        label: 'Accounts',
+        routeName: 'accounts.index',
+        service: 'budget-planner',
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M3 10h18M5 6V4a1 1 0 011-1h12a1 1 0 011 1v2M3 10v8a2 2 0 002 2h14a2 2 0 002-2v-8" />
+            </svg>
+        ),
+    },
+    {
+        label: 'Transactions',
+        routeName: 'transactions.index',
         service: 'budget-planner',
         icon: (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

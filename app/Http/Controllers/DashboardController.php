@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use App\Models\Budget;
-use App\Models\Expense;
-use App\Models\Income;
 use App\Models\Loan;
 use App\Models\Resume\Resume;
-use App\Models\Saving;
 use App\Models\Task;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -22,32 +21,44 @@ class DashboardController extends Controller
         $month  = (int) ($request->input('month', now()->month));
         $year   = (int) ($request->input('year',  now()->year));
 
-        $dateFrom = Carbon::createFromDate($year, $month, 1)->startOfMonth()->toDateString();
-        $dateTo   = Carbon::createFromDate($year, $month, 1)->endOfMonth()->toDateString();
+        $monthStart = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $monthEnd   = $monthStart->copy()->endOfMonth();
 
-        // ── Expenses ──────────────────────────────────────────────────────────
-        $expenseQuery = Expense::where('created_by', $userId)->whereBetween('date', [$dateFrom, $dateTo]);
-        $expenses = [
-            'count' => (clone $expenseQuery)->count(),
-            'total' => (clone $expenseQuery)->sum('amount'),
-        ];
+        // ── Opening balance (sum of all credits/debits before this month) ─────
+        $txnOpeningNet = Transaction::withoutGlobalScopes()
+            ->where('created_by', $userId)
+            ->where('date', '<', $monthStart->toDateString())
+            ->selectRaw("SUM(CASE WHEN direction='credit' THEN amount ELSE -amount END) as net")
+            ->value('net') ?? 0;
 
-        // ── Income ────────────────────────────────────────────────────────────
-        $incomeQuery = Income::where('created_by', $userId)->where('month', $month)->where('year', $year);
-        $incomes = [
-            'count' => (clone $incomeQuery)->count(),
-            'total' => (clone $incomeQuery)->sum('amount'),
-        ];
+        $accountsOpeningTotal = Account::withoutGlobalScopes()
+            ->where('created_by', $userId)
+            ->sum('opening_balance');
 
-        // ── Budget ────────────────────────────────────────────────────────────
-        $budgetQuery = Budget::where('created_by', $userId)->where('month', $month)->where('year', $year);
-        $budgets = [
-            'count' => (clone $budgetQuery)->count(),
-            'total' => (clone $budgetQuery)->sum('amount'),
-        ];
+        $openingBalance = round((float) $accountsOpeningTotal + (float) $txnOpeningNet, 2);
+
+        // ── This month's transactions ─────────────────────────────────────────
+        $monthTxns = Transaction::withoutGlobalScopes()
+            ->where('created_by', $userId)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->get(['type', 'direction', 'amount']);
+
+        $totalIncome  = $monthTxns->where('direction', 'credit')->whereIn('type', ['income', 'borrow', 'lend_repayment'])->sum('amount');
+        $totalExpense = $monthTxns->where('direction', 'debit')->whereIn('type', ['expense', 'lend', 'borrow_repayment', 'saving'])->sum('amount');
+        $monthNet     = $monthTxns->sum(fn ($t) => $t->direction === 'credit' ? (float) $t->amount : -(float) $t->amount);
+        $closingBalance = round($openingBalance + $monthNet, 2);
+
+        // ── Budget planned vs spent ───────────────────────────────────────────
+        $budgetTotal = Budget::withoutGlobalScopes()
+            ->where('created_by', $userId)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->sum('amount');
 
         // ── Tasks ─────────────────────────────────────────────────────────────
-        $taskQuery = Task::where('created_by', $userId)->whereBetween('date', [$dateFrom, $dateTo]);
+        $taskQuery = Task::where('created_by', $userId)
+            ->whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()]);
         $tasks = [
             'count'     => (clone $taskQuery)->count(),
             'pending'   => (clone $taskQuery)->where('status', 0)->count(),
@@ -56,23 +67,14 @@ class DashboardController extends Controller
             'cancelled' => (clone $taskQuery)->where('status', 3)->count(),
         ];
 
-        // ── Savings ───────────────────────────────────────────────────────────
-        $savingQuery = Saving::where('created_by', $userId)->whereBetween('date', [$dateFrom, $dateTo]);
-        $savings = [
-            'count' => (clone $savingQuery)->count(),
-            'total' => (clone $savingQuery)->sum('amount'),
-        ];
-
         // ── Resumes ───────────────────────────────────────────────────────────
-        $resumes = [
-            'count' => Resume::where('created_by', $userId)->count(),
-        ];
+        $resumes = ['count' => Resume::where('created_by', $userId)->count()];
 
-        // ── Loans ─────────────────────────────────────────────────────────────
+        // ── Loans outstanding ─────────────────────────────────────────────────
         $allLoans = Loan::withoutGlobalScopes()
             ->where('created_by', $userId)
             ->whereIn('status', ['unpaid', 'partial'])
-            ->with('repayments')
+            ->with('repaymentTransactions')
             ->get();
 
         $lendLoans   = $allLoans->where('type', 'lend');
@@ -85,32 +87,32 @@ class DashboardController extends Controller
             'borrow_outstanding' => round($borrowLoans->sum(fn ($l) => $l->outstanding), 2),
         ];
 
-        // ── Carry-forward alert ───────────────────────────────────────────────
-        $prevDate    = Carbon::createFromDate($year, $month, 1)->subMonth();
-        $prevMonth   = $prevDate->month;
-        $prevYear    = $prevDate->year;
-        $prevIncome  = Income::where('created_by', $userId)->where('month', $prevMonth)->where('year', $prevYear)->sum('amount');
-        $prevDateFrom = $prevDate->copy()->startOfMonth()->toDateString();
-        $prevDateTo   = $prevDate->copy()->endOfMonth()->toDateString();
-        $prevExpenses = Expense::where('created_by', $userId)->whereBetween('date', [$prevDateFrom, $prevDateTo])->sum('amount');
-        $prevNet      = round($prevIncome - $prevExpenses, 2);
-        $carryExists  = Income::where('created_by', $userId)->where('month', $month)->where('year', $year)->where('type', 3)->exists();
-
-        $carryForward = [
-            'prev_month'    => $prevMonth,
-            'prev_year'     => $prevYear,
-            'prev_net'      => $prevNet,
-            'already_added' => $carryExists,
-        ];
+        // ── Accounts ──────────────────────────────────────────────────────────
+        $accounts = Account::withoutGlobalScopes()
+            ->where('created_by', $userId)
+            ->where('status', true)
+            ->with('transactions')
+            ->get()
+            ->map(fn ($a) => [
+                'id'      => $a->id,
+                'name'    => $a->name,
+                'type'    => $a->type,
+                'balance' => $a->balance,
+            ]);
 
         return Inertia::render('Dashboard', [
-            'stats' => compact('expenses', 'incomes', 'budgets', 'tasks', 'savings', 'resumes'),
-            'loans'        => $loans,
-            'carryForward' => $carryForward,
-            'filters' => [
-                'month' => $month,
-                'year'  => $year,
+            'stats' => [
+                'opening_balance' => $openingBalance,
+                'closing_balance' => $closingBalance,
+                'total_income'    => round((float) $totalIncome, 2),
+                'total_expense'   => round((float) $totalExpense, 2),
+                'budget_planned'  => round((float) $budgetTotal, 2),
+                'tasks'           => $tasks,
+                'resumes'         => $resumes,
             ],
+            'loans'    => $loans,
+            'accounts' => $accounts,
+            'filters'  => compact('month', 'year'),
         ]);
     }
 }

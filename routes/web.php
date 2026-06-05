@@ -4,8 +4,8 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\BudgetController;
-use App\Http\Controllers\IncomeController;
-use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
@@ -118,10 +118,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ── Budget Planner features (requires subscription: budget-planner) ──────
     Route::middleware('subscribed:budget-planner')->group(function () {
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
-        Route::resource('/income', IncomeController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::post('/income/carry-forward', [IncomeController::class, 'carryForward'])->name('income.carry-forward');
+
+        // Accounts
+        Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
+        Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
+        Route::post('/accounts/bulk', [AccountController::class, 'storeBulk'])->name('accounts.store.bulk');
+        Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('accounts.destroy');
+
+        // Transactions (replaces income + expense + savings)
+        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+        Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+
+        // Budget plans
         Route::resource('/budget', BudgetController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::resource('/expense', ExpenseController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::post('/budget/bulk', [BudgetController::class, 'storeBulk'])->name('budget.store.bulk');
+
+        // Categories
         Route::resource('/category', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
 
         // Loans (lend & borrow)

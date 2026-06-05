@@ -30,9 +30,16 @@ class Loan extends Model
 
     // ── Relationships ─────────────────────────────────────────────────────────
 
-    public function repayments(): HasMany
+    /**
+     * Repayment transactions linked to this loan.
+     * type is lend_repayment (if loan.type=lend) or borrow_repayment (if loan.type=borrow).
+     */
+    public function repaymentTransactions(): HasMany
     {
-        return $this->hasMany(LoanRepayment::class)->orderBy('repayment_date');
+        return $this->hasMany(Transaction::class, 'reference_id')
+            ->where('reference_type', 'loan')
+            ->whereIn('type', ['lend_repayment', 'borrow_repayment'])
+            ->orderBy('date');
     }
 
     // ── Computed helpers ──────────────────────────────────────────────────────
@@ -40,7 +47,7 @@ class Loan extends Model
     /** Total amount repaid so far. */
     public function getPaidAmountAttribute(): float
     {
-        return (float) $this->repayments->sum('amount');
+        return (float) $this->repaymentTransactions->sum('amount');
     }
 
     /** Remaining balance. */
@@ -49,15 +56,15 @@ class Loan extends Model
         return max(0, (float) $this->amount - $this->paid_amount);
     }
 
-    /** Recalculate and persist status based on repayments. */
+    /** Recalculate and persist status based on repayment transactions. */
     public function syncStatus(): void
     {
         $paid = $this->paid_amount;
 
         $status = match (true) {
-            $paid <= 0                       => 'unpaid',
-            $paid < (float) $this->amount    => 'partial',
-            default                          => 'paid',
+            $paid <= 0                    => 'unpaid',
+            $paid < (float) $this->amount => 'partial',
+            default                       => 'paid',
         };
 
         if ($this->status !== $status) {
