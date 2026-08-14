@@ -24,6 +24,8 @@ use App\Http\Controllers\Resume\ResumeSkillController;
 use App\Http\Controllers\Resume\ResumeLanguageController;
 use App\Http\Controllers\Resume\ResumeSocialLinkController;
 use App\Http\Controllers\Resume\ResumeDownloadController;
+use App\Http\Controllers\AiPlatformController;
+use App\Http\Controllers\EmailCredentialController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
@@ -98,6 +100,22 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Email Credentials (gated behind its own service)
+    Route::middleware('subscribed:email-credentials')->group(function () {
+        Route::get('/email-credentials', [EmailCredentialController::class, 'index'])->name('email-credentials.index');
+        Route::post('/email-credentials', [EmailCredentialController::class, 'store'])->name('email-credentials.store');
+        Route::post('/email-credentials/ai-usages', [EmailCredentialController::class, 'storeAiUsages'])->name('email-credentials.ai-usages');
+        Route::get('/email-credentials/{emailCredential}/password', [EmailCredentialController::class, 'showPassword'])->name('email-credentials.password');
+        Route::delete('/email-credentials/{emailCredential}', [EmailCredentialController::class, 'destroy'])->name('email-credentials.destroy');
+    });
+
+    // AI Platforms (global — any authenticated user can manage)
+    Route::get('/ai-platforms/suggestions', [AiPlatformController::class, 'suggestions'])->name('ai-platforms.suggestions');
+    Route::get('/ai-platforms/new-agents', [AiPlatformController::class, 'newAgents'])->name('ai-platforms.new-agents');
+    Route::get('/ai-platforms', [AiPlatformController::class, 'index'])->name('ai-platforms.index');
+    Route::post('/ai-platforms', [AiPlatformController::class, 'store'])->name('ai-platforms.store');
+    Route::delete('/ai-platforms/{aiPlatform}', [AiPlatformController::class, 'destroy'])->name('ai-platforms.destroy');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
