@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { router } from '@inertiajs/react';
-import { X, ExternalLink, Sparkles, Search, CheckCircle2, PlusCircle, RefreshCw, Filter } from 'lucide-react';
+import { X, ExternalLink, Sparkles, Search, CheckCircle2, PlusCircle, RefreshCw, Filter, MonitorDot } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import axios from 'axios';
 
@@ -8,9 +8,10 @@ import axios from 'axios';
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CATEGORIES = ['All', 'Chat', 'Code', 'Image', 'Video', 'Audio', 'Writing', 'Productivity', 'Search'];
+const CATEGORIES = ['All', 'AI IDE', 'Chat', 'Code', 'Image', 'Video', 'Audio', 'Writing', 'Productivity', 'Search'];
 
 const CATEGORY_COLOR = {
+    'AI IDE':     'bg-cyan-100 text-cyan-800',
     Chat:         'bg-indigo-100 text-indigo-700',
     Code:         'bg-emerald-100 text-emerald-700',
     Image:        'bg-pink-100 text-pink-700',
@@ -28,14 +29,26 @@ const TOKEN_LABEL = { monthly: 'Monthly reset', weekly: 'Weekly reset', daily: '
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AgentCard({ agent, onAdd, added }) {
-    const catCls = CATEGORY_COLOR[agent.category] ?? 'bg-gray-100 text-gray-600';
+    const catCls  = CATEGORY_COLOR[agent.category] ?? 'bg-gray-100 text-gray-600';
+    const isIde   = agent.category === 'AI IDE';
 
     return (
         <div className={`relative flex flex-col border rounded-xl p-4 transition-all ${
             added
                 ? 'border-green-300 bg-green-50/50'
-                : 'border-gray-200 bg-white hover:border-violet-300 hover:shadow-md'
+                : isIde
+                    ? 'border-cyan-200 bg-white hover:border-cyan-400 hover:shadow-md'
+                    : 'border-gray-200 bg-white hover:border-violet-300 hover:shadow-md'
         }`}>
+
+            {/* IDE corner ribbon */}
+            {isIde && !added && (
+                <div className="absolute top-0 right-0 overflow-hidden w-14 h-14 pointer-events-none">
+                    <div className="absolute top-2.5 right-[-14px] rotate-45 bg-cyan-500 text-white text-[9px] font-bold px-5 py-0.5 shadow-sm">
+                        IDE
+                    </div>
+                </div>
+            )}
 
             {/* Added checkmark */}
             {added && (
@@ -44,10 +57,11 @@ function AgentCard({ agent, onAdd, added }) {
                 </div>
             )}
 
-            {/* Header row */}
+            {/* Header */}
             <div className="flex items-start gap-2 mb-2 pr-6">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
+                        {isIde && <MonitorDot size={13} className="text-cyan-500 shrink-0" />}
                         <span className="font-semibold text-gray-800 text-sm">{agent.name}</span>
                         {agent.website && (
                             <a href={agent.website} target="_blank" rel="noopener noreferrer"
@@ -62,7 +76,7 @@ function AgentCard({ agent, onAdd, added }) {
                 </div>
             </div>
 
-            {/* Badges row */}
+            {/* Badges */}
             <div className="flex flex-wrap gap-1.5 mb-3">
                 {agent.category && (
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${catCls}`}>
@@ -81,17 +95,15 @@ function AgentCard({ agent, onAdd, added }) {
                 </span>
             </div>
 
-            {/* Free tier section */}
+            {/* Free tier */}
             <div className={`rounded-lg px-3 py-2 mb-3 text-xs flex-1 ${
                 agent.free_tier
                     ? 'bg-green-50 border border-green-200'
                     : 'bg-gray-50 border border-gray-200'
             }`}>
-                <div className="flex items-center gap-1 mb-0.5">
-                    <span className={`font-semibold ${agent.free_tier ? 'text-green-700' : 'text-gray-500'}`}>
-                        {agent.free_tier ? '✓ Free tier available' : '✗ No free tier'}
-                    </span>
-                </div>
+                <span className={`font-semibold block mb-0.5 ${agent.free_tier ? 'text-green-700' : 'text-gray-500'}`}>
+                    {agent.free_tier ? '✓ Free tier available' : '✗ No free tier'}
+                </span>
                 {agent.free_details && (
                     <p className={`leading-snug ${agent.free_tier ? 'text-green-600' : 'text-gray-400'}`}>
                         {agent.free_details}
@@ -99,12 +111,16 @@ function AgentCard({ agent, onAdd, added }) {
                 )}
             </div>
 
-            {/* Action button */}
+            {/* Add button */}
             {!added ? (
                 <button
                     type="button"
                     onClick={() => onAdd(agent)}
-                    className="w-full flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition"
+                    className={`w-full flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg transition ${
+                        isIde
+                            ? 'bg-cyan-600 text-white hover:bg-cyan-700'
+                            : 'bg-violet-600 text-white hover:bg-violet-700'
+                    }`}
                 >
                     <PlusCircle size={14} /> Add to My List
                 </button>
@@ -211,7 +227,7 @@ export default function NewAgentsModal({ show, onClose, onAdded }) {
                             Discover New AI Agents
                         </h2>
                         <p className="text-xs text-gray-500 mt-0.5">
-                            Recently launched platforms not yet in your list — with free tier details.
+                            Recently launched platforms not yet in your list — including agentic AI IDEs with free tier details.
                             Click "Add to My List" to save any platform.
                         </p>
                     </div>
@@ -314,7 +330,22 @@ export default function NewAgentsModal({ show, onClose, onAdded }) {
                         </div>
                     )}
 
-                    {!loading && !error && agents.length > 0 && (
+                {!loading && !error && agents.length > 0 && (
+                    <>
+                        {/* AI IDE callout banner */}
+                        {category === 'AI IDE' && (
+                            <div className="flex items-start gap-3 mb-5 px-4 py-3 rounded-xl bg-cyan-50 border border-cyan-200">
+                                <MonitorDot size={18} className="text-cyan-600 mt-0.5 shrink-0" />
+                                <div>
+                                    <p className="text-sm font-semibold text-cyan-800">Agentic AI-Powered IDEs</p>
+                                    <p className="text-xs text-cyan-700 mt-0.5 leading-relaxed">
+                                        These are full development environments where the AI doesn't just suggest code —
+                                        it <strong>plans, writes, runs, tests and iterates</strong> autonomously across your entire codebase.
+                                        Many are free to start. Hover any card for details.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {agents.map((agent) => (
                                 <AgentCard
@@ -325,7 +356,8 @@ export default function NewAgentsModal({ show, onClose, onAdded }) {
                                 />
                             ))}
                         </div>
-                    )}
+                    </>
+                )}
                 </div>
 
                 {/* ── Footer ──────────────────────────────────────────────── */}
