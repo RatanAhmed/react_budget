@@ -104,7 +104,7 @@ export default function CurrentMonthUsageModal({ show, onClose, credentials = []
                         <p className="text-xs text-gray-500 mt-0.5">
                             <span className="font-semibold text-violet-600">{monthLabel}</span>
                             {' '}— click a cell to mark{' '}
-                            <span className="font-mono font-bold text-red-500">✗</span>
+                            <span className="font-mono font-bold text-red-500">x</span>
                             {' '}when a token has been used this month.
                         </p>
                     </div>
@@ -178,26 +178,10 @@ export default function CurrentMonthUsageModal({ show, onClose, credentials = []
 
                                             {/* Email */}
                                             <td className={`px-4 py-3 sticky left-0 z-10 border-r border-gray-200 whitespace-nowrap ${rowBg}`}>
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className="font-medium text-gray-800 text-sm"
-                                                        title={cred.email}>
-                                                        {cred.email}
-                                                    </span>
-                                                    {/* Small registered-on pills */}
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {registeredOn.slice(0, 3).map((p) => (
-                                                            <span key={p}
-                                                                className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-500 font-medium">
-                                                                {p.split(' ')[0]}
-                                                            </span>
-                                                        ))}
-                                                        {registeredOn.length > 3 && (
-                                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-400">
-                                                                +{registeredOn.length - 3}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
+                                                <span className="font-medium text-gray-800 text-sm"
+                                                    title={cred.email}>
+                                                    {cred.email}
+                                                </span>
                                             </td>
 
                                             {/* Platform cells */}
@@ -216,14 +200,14 @@ export default function CurrentMonthUsageModal({ show, onClose, credentials = []
                                                                 type="button"
                                                                 onClick={() => toggle(cred, name)}
                                                                 title={`${used ? 'Mark unused' : 'Mark used'}: ${name} — ${cred.email}`}
-                                                                className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center transition-all font-bold text-base select-none ${
+                                                                className={`w-6 h-6 mx-auto rounded-lg flex items-center justify-center transition-all font-bold text-base select-none ${
                                                                     used
                                                                         ? 'bg-red-100 text-red-500 hover:bg-red-200 ring-1 ring-red-300'
                                                                         : 'bg-gray-100 text-gray-300 hover:bg-violet-100 hover:text-violet-400'
                                                                 }`}
                                                                 aria-label={`${name} ${used ? 'used' : 'not used'} for ${cred.email}`}
                                                             >
-                                                                {used ? '✗' : '·'}
+                                                                {used ? 'x' : ''}
                                                             </button>
                                                         ) : (
                                                             /* Not registered — greyed out dash */
@@ -251,7 +235,7 @@ export default function CurrentMonthUsageModal({ show, onClose, credentials = []
                             </tbody>
 
                             {/* Footer: column totals */}
-                            <tfoot className="sticky bottom-0 z-20">
+                            {/* <tfoot className="sticky bottom-0 z-20">
                                 <tr className="border-t-2 border-gray-200 bg-gray-100">
                                     <td className="px-4 py-2.5 text-xs font-bold text-gray-600 sticky left-0 bg-gray-100 border-r border-gray-200 z-30">
                                         Total used
@@ -280,7 +264,7 @@ export default function CurrentMonthUsageModal({ show, onClose, credentials = []
                                         </span>
                                     </td>
                                 </tr>
-                            </tfoot>
+                            </tfoot> */}
                         </table>
                     )}
                 </div>
