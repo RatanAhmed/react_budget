@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import CredentialTable     from '@/Components/EmailCredentials/CredentialTable';
-import CredentialFormModal from '@/Components/EmailCredentials/CredentialFormModal';
-import AiUsageMatrixModal  from '@/Components/EmailCredentials/AiUsageMatrixModal';
-import AiAgentsList        from '@/Components/EmailCredentials/AiAgentsList';
+import CredentialTable          from '@/Components/EmailCredentials/CredentialTable';
+import CredentialFormModal      from '@/Components/EmailCredentials/CredentialFormModal';
+import AiUsageMatrixModal       from '@/Components/EmailCredentials/AiUsageMatrixModal';
+import AiAgentsList             from '@/Components/EmailCredentials/AiAgentsList';
+import CurrentMonthUsageModal   from '@/Components/EmailCredentials/CurrentMonthUsageModal';
 
 /**
  * Email Credentials index page.
@@ -29,6 +30,9 @@ export default function Index({ auth, credentials, platforms }) {
     const openUsage  = (row) => { setUsageTarget(row); setUsageModal(true); };
     const closeUsage = () => { setUsageModal(false); setUsageTarget(null); };
 
+    // ── Current month usage modal ─────────────────────────────────────────────
+    const [monthModal, setMonthModal] = useState(false);
+
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Email Credentials" />
@@ -39,6 +43,7 @@ export default function Index({ auth, credentials, platforms }) {
                     onAdd={openCreate}
                     onEdit={openEdit}
                     onUsage={openUsage}
+                    onMonthUsage={() => setMonthModal(true)}
                 />
 
                 {/* AI platforms listing — shows which emails are on each platform */}
@@ -62,6 +67,14 @@ export default function Index({ auth, credentials, platforms }) {
                 show={usageModal}
                 onClose={closeUsage}
                 credential={usageTarget}
+                platforms={platforms}
+            />
+
+            {/* Current month usage — all emails × all registered platforms */}
+            <CurrentMonthUsageModal
+                show={monthModal}
+                onClose={() => setMonthModal(false)}
+                credentials={credentials}
                 platforms={platforms}
             />
         </AuthenticatedLayout>

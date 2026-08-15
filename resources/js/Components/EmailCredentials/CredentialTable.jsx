@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { Eye, EyeOff, BarChart2, CirclePlus } from 'lucide-react';
+import { Eye, EyeOff, BarChart2, CirclePlus, CalendarDays } from 'lucide-react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import DataTable from '@/Components/DataTable';
 import axios from 'axios';
@@ -14,7 +14,7 @@ import axios from 'axios';
  *   onEdit        – (row) => void — open edit modal
  *   onUsage       – (row) => void — open AI usage modal for this row
  */
-export default function CredentialTable({ credentials, onAdd, onEdit, onUsage }) {
+export default function CredentialTable({ credentials, onAdd, onEdit, onUsage, onMonthUsage }) {
     const [revealed, setRevealed]     = useState({});   // id → plaintext
     const [loadingPwd, setLoadingPwd] = useState(null);
 
@@ -146,9 +146,19 @@ export default function CredentialTable({ credentials, onAdd, onEdit, onUsage })
                         Passwords are AES-256 encrypted and never shown in the listing.
                     </p>
                 </div>
-                <PrimaryButton type="button" onClick={onAdd}>
-                    Add Credential <CirclePlus size={16} className="ml-1" />
-                </PrimaryButton>
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={onMonthUsage}
+                        className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border border-violet-300 text-violet-700 bg-violet-50 hover:bg-violet-100 transition font-medium"
+                    >
+                        <CalendarDays size={15} />
+                        This Month
+                    </button>
+                    <PrimaryButton type="button" onClick={onAdd}>
+                        Add Credential <CirclePlus size={16} className="ml-1" />
+                    </PrimaryButton>
+                </div>
             </div>
 
             <div className="p-4 sm:p-6">

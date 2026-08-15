@@ -8,19 +8,22 @@ export default function Modal({ children, show = false, maxWidth = '2xl', closea
         }
     };
 
+    // Tailwind classes for standard sizes — must be full strings so JIT keeps them
     const maxWidthClass = {
-        sm:     'sm:max-w-sm',
-        md:     'sm:max-w-md',
-        lg:     'sm:max-w-lg',
-        xl:     'sm:max-w-xl',
-        '2xl':  'sm:max-w-2xl',
-        '3xl':  'sm:max-w-3xl',
-        '4xl':  'sm:max-w-4xl',
-        '5xl':  'sm:max-w-5xl',
-        '6xl':  'sm:max-w-6xl',
-        '7xl':  'sm:max-w-7xl',
-        screen: 'sm:max-w-[95vw]',
-    }[maxWidth] ?? 'sm:max-w-2xl';
+        sm:    'max-w-sm',
+        md:    'max-w-md',
+        lg:    'max-w-lg',
+        xl:    'max-w-xl',
+        '2xl': 'max-w-2xl',
+        '3xl': 'max-w-3xl',
+        '4xl': 'max-w-4xl',
+        '5xl': 'max-w-5xl',
+        '6xl': 'max-w-6xl',
+        '7xl': 'max-w-7xl',
+    }[maxWidth] ?? null;
+
+    // screen = 95vw — use inline style to bypass Tailwind purging of dynamic values
+    const panelStyle = maxWidth === 'screen' ? { maxWidth: '95vw' } : undefined;
 
     return (
         <Transition show={show} as={Fragment} leave="duration-200">
@@ -56,7 +59,8 @@ export default function Modal({ children, show = false, maxWidth = '2xl', closea
                         leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     >
                         <Dialog.Panel
-                            className={`relative bg-white rounded-lg shadow-xl transform transition-all w-full sm:mx-auto ${maxWidthClass}`}
+                            style={panelStyle}
+                            className={`relative bg-white rounded-lg shadow-xl transform transition-all w-full mx-auto ${maxWidthClass ?? ''}`}
                         >
                             {children}
                         </Dialog.Panel>

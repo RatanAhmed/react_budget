@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import Modal from '@/Components/Modal';
@@ -34,6 +34,24 @@ export default function CredentialFormModal({ show, onClose, initial = null, pla
     });
 
     const [showPwd, setShowPwd] = useState(false);
+
+    // Re-sync form fields every time the modal opens or the target row changes.
+    // useForm initializes only once at mount, so without this the email (and all
+    // other fields) would stay stale/empty when switching between edit targets.
+    useEffect(() => {
+        if (!show) return;
+        setData({
+            id:           initial?.id           ?? null,
+            email:        initial?.email        ?? '',
+            password:     '',
+            device_count: initial?.device_count ?? 1,
+            used_with:    initial?.used_with    ?? [],
+            notes:        initial?.notes        ?? '',
+            status:       initial?.status       ?? true,
+        });
+        setShowPwd(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, initial?.id]);
 
     const handleClose = () => { reset(); onClose(); };
 
