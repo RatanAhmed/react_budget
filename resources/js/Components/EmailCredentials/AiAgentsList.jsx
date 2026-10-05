@@ -33,12 +33,19 @@ const CATEGORY_COLOR = {
     Productivity: 'bg-lime-50 text-lime-700 border-lime-200',
 };
 
-/** Count total months used for a platform across ALL years from ai_usages */
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+/** Return sorted unique month names used for a platform across ALL years from ai_usages */
 function totalMonthsUsed(credential, platformName) {
     const usages = credential.ai_usages ?? {};
-    return Object.entries(usages)
+    const monthNumbers = new Set();
+    Object.entries(usages)
         .filter(([k]) => k.startsWith(`${platformName}|`))
-        .reduce((sum, [, months]) => sum + (months?.length ?? 0), 0);
+        .forEach(([, months]) => (months ?? []).forEach((m) => monthNumbers.add(Number(m))));
+    return [...monthNumbers]
+        .sort((a, b) => a - b)
+        .map((m) => MONTH_NAMES[m - 1])
+        .filter(Boolean);
 }
 
 export default function AiAgentsList({ platforms, credentials, onUsage }) {
@@ -155,9 +162,12 @@ export default function AiAgentsList({ platforms, credentials, onUsage }) {
                                                                 {cred.email}
                                                             </span>
                                                             <div className="flex items-center gap-1.5 shrink-0">
-                                                                {months > 0 && (
+                                                                {months.length > 0 && (
                                                                     <span className="text-xs text-violet-600 font-semibold">
-                                                                        {months}mo
+                                                                        {months.slice(-3).join(', ')}
+                                                                        {months.length > 3 && (
+                                                                            <span className="ml-1 text-gray-400 font-normal">+{months.length - 3}</span>
+                                                                        )}
                                                                     </span>
                                                                 )}
                                                                 <button

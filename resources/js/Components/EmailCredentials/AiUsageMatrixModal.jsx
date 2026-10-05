@@ -36,7 +36,8 @@ export default function AiUsageMatrixModal({ show, onClose, credential, platform
     const aiUsages = localUsages ?? credential.ai_usages ?? {};
     const isDirty  = localUsages !== null;
 
-    const agentNames = platforms.map((p) => p.name);
+    const registeredOn = new Set(credential.used_with ?? []);
+    const agentNames = platforms.map((p) => p.name).filter((name) => registeredOn.has(name));
 
     const toggle = (agent, monthNum) => {
         setLocalUsages(toggleMonth(aiUsages, agent, year, monthNum));
@@ -81,17 +82,14 @@ export default function AiUsageMatrixModal({ show, onClose, credential, platform
     );
 
     return (
-        <Modal show={show} onClose={onClose} maxWidth="screen">
+        <Modal show={show} onClose={onClose} maxWidth="3xl">
             <div className="flex flex-col max-h-[90vh]">
 
                 {/* ── Header ──────────────────────────────────────────────── */}
                 <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-gray-200 shrink-0">
                     <div className="min-w-0">
-                        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                            AI Monthly Usage
-                        </h2>
                         <p className="text-xs text-gray-500 mt-0.5 truncate">
-                            {credential.email} — mark months where token was consumed
+                            <span className="font-semibold">{credential.email}</span> — mark months where token was consumed
                         </p>
                     </div>
 
@@ -174,10 +172,6 @@ export default function AiUsageMatrixModal({ show, onClose, credential, platform
                                         {m}
                                     </th>
                                 ))}
-                                {/* Total header */}
-                                <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 py-3 w-14 border-l border-gray-200">
-                                    /12
-                                </th>
                             </tr>
                         </thead>
 
@@ -193,33 +187,10 @@ export default function AiUsageMatrixModal({ show, onClose, credential, platform
                                         className={`${rowBg} hover:bg-violet-50/30 transition-colors border-b border-gray-100 last:border-0`}
                                     >
                                         {/* Agent name + select-all toggle */}
-                                        <td className={`px-4 py-2.5 sticky left-0 z-10 border-r border-gray-200 ${rowBg}`}>
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleAllForAgent(agent)}
-                                                    title={allChecked ? 'Deselect all months' : 'Select all months'}
-                                                    className={`w-4 h-4 rounded border flex items-center justify-center transition shrink-0 ${
-                                                        allChecked
-                                                            ? 'bg-violet-500 border-violet-500 text-white'
-                                                            : count > 0
-                                                                ? 'bg-violet-200 border-violet-300'
-                                                                : 'border-gray-300 hover:border-violet-400'
-                                                    }`}
-                                                >
-                                                    {(allChecked || count > 0) && (
-                                                        <svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none">
-                                                            {allChecked
-                                                                ? <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                                : <path d="M2 5h6" stroke="#7c3aed" strokeWidth="1.5" strokeLinecap="round"/>
-                                                            }
-                                                        </svg>
-                                                    )}
-                                                </button>
-                                                <span className="font-medium text-gray-700 text-sm truncate">
-                                                    {agent}
-                                                </span>
-                                            </div>
+                                        <td className={`text-start px-4 py-2.5 sticky left-0 z-10 border-r border-gray-200 ${rowBg}`}>
+                                            <span className="font-medium text-gray-700 text-sm truncate">
+                                                {agent}
+                                            </span>
                                         </td>
 
                                         {/* Month checkboxes */}
@@ -241,28 +212,13 @@ export default function AiUsageMatrixModal({ show, onClose, credential, platform
                                                 </td>
                                             );
                                         })}
-
-                                        {/* Row total badge */}
-                                        <td className="text-center px-3 py-2.5 border-l border-gray-200">
-                                            {count > 0 ? (
-                                                <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                                                    count === 12
-                                                        ? 'bg-violet-600 text-white'
-                                                        : 'bg-violet-100 text-violet-700'
-                                                }`}>
-                                                    {count}
-                                                </span>
-                                            ) : (
-                                                <span className="text-gray-300 text-xs">—</span>
-                                            )}
-                                        </td>
                                     </tr>
                                 );
                             })}
                         </tbody>
 
                         {/* Footer: column totals */}
-                        <tfoot className="sticky bottom-0 z-20">
+                        {/* <tfoot className="sticky bottom-0 z-20">
                             <tr className="border-t-2 border-gray-300 bg-gray-100">
                                 <td className="px-4 py-2.5 text-xs font-bold text-gray-600 sticky left-0 bg-gray-100 border-r border-gray-200 z-30">
                                     Total
@@ -282,11 +238,8 @@ export default function AiUsageMatrixModal({ show, onClose, credential, platform
                                         </td>
                                     );
                                 })}
-                                <td className="border-l border-gray-200 text-center px-3 py-2.5 text-xs font-bold text-violet-700 bg-gray-100">
-                                    {grandTotal}
-                                </td>
                             </tr>
-                        </tfoot>
+                        </tfoot> */}
                     </table>
                 </div>
 
